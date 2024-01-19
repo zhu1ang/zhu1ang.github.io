@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://zhu1ang.github.io</id>
+    <title>zhu1ang</title>
+    <updated>2024-01-19T12:35:34.422Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://zhu1ang.github.io"/>
+    <link rel="self" href="https://zhu1ang.github.io/atom.xml"/>
+    <subtitle>失败总是贯穿人生始终，这就是人生</subtitle>
+    <logo>https://zhu1ang.github.io/images/avatar.png</logo>
+    <icon>https://zhu1ang.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2024, zhu1ang</rights>
+    <entry>
+        <title type="html"><![CDATA[test]]></title>
+        <id>https://zhu1ang.github.io/post/rtOaJbSrP/</id>
+        <link href="https://zhu1ang.github.io/post/rtOaJbSrP/">
+        </link>
+        <updated>2024-01-19T12:32:47.000Z</updated>
+        <content type="html"><![CDATA[<p>这是一个测试文档，这里什么也没有</p>
+]]></content>
+    </entry>
+</feed>
