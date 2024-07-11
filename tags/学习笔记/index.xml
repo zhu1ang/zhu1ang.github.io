@@ -1,33 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>江南酒与燕赵歌</title>
-    <link>https://zhu1ang.github.io/</link>
-    <description>Recent content on 江南酒与燕赵歌</description>
+    <title>学习笔记 on 江南酒与燕赵歌</title>
+    <link>https://zhu1ang.github.io/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+    <description>Recent content in 学习笔记 on 江南酒与燕赵歌</description>
     <generator>Hugo</generator>
     <language>zh</language>
     <lastBuildDate>Thu, 11 Jul 2024 10:15:39 +0800</lastBuildDate>
-    <atom:link href="https://zhu1ang.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://zhu1ang.github.io/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>【栈溢出】DIR-815漏洞复现</title>
       <link>https://zhu1ang.github.io/post/dir815/</link>
       <pubDate>Thu, 11 Jul 2024 10:15:39 +0800</pubDate>
       <guid>https://zhu1ang.github.io/post/dir815/</guid>
       <description>1 环境准备 固件下载链接：DLink下载&#xA;物理机：Ubuntu 20.04 （需安装binwalk、qemu、pwntools等）&#xA;反汇编共工具：IDA Pro&#xA;2 静态分析 根据已有的资料，DIR-815多重栈溢出漏洞和前端的超长cookie有关，并且漏洞文件为 hedweb.cgi&#xA;首先对固件进行解包&#xA;binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi&#xA;是/htdocs/cgibin的软链接，因此，使用IDA逆向分析cgibin&#xA;在main函数中可以看到，此处为hedwigcgi_main函数分支&#xA;另外根据cgi-bin的架构和常用的变量，若要操作cookie，需使用getenv(&amp;quot;HTTP_COOKIE&amp;quot;)&#xA;直接搜索&amp;quot;HTTP_COOKIE&amp;quot;字符串，根据交叉引用，只有sess_get_uid这个函数使用了这 个字符串&#xA;继续通过交叉引用回溯，发现在hedwigcgi_main调用了这个函数&#xA;并且两次调用了sprintf这个危险函数，两次拼接使用的字符串都是sess_get_uid处理之后的v4，分析sess_get_uid函数可知，v4是COOKIE中的uid的值。&#xA;如果能走到第二个sprintf函数，则会覆盖上一次拼接的内容，则第二处sprintf是溢出点&#xA;两个判断需要满足的条件为：存在/var/tmp 目录以及环境变量REQUEST_URI不为空。&#xA;由于固件解包后不存在/var/tmp目录，故需要自己创建，否则后续测试偏移时由于无法走到第二个sprintf函数会出错。&#xA;3 动态调试 3.1 qemu用户模式复现 #!/bin/sh INPUT=&amp;#34;uid=1234&amp;#34; TEST=&amp;#34;uid=1234`cat payload`&amp;#34; LEN=$(echo -n &amp;#34;INPUT&amp;#34; |wc -c) PORT=&amp;#34;1234&amp;#34; cd ./squashfs-root cp $(which qemu-mipsel-static) ./qemu echo $INPUT | chroot . ./qemu -E CONTENT_LENGTH=$LEN -E CONTENT_TYPE=&amp;#34;application/x-www-form-urlencoded&amp;#34; -E REQUEST_METHOD=&amp;#34;POST&amp;#34; -E HTTP_COOKIE=$TEST -E REQUEST_URI=&amp;#34;/hedwig.cgi&amp;#34; -g $PORT /htdocs/web/hedwig.cgi rm -f ./qemu 用以上脚本启动qemu模拟CGI程序，其中</description>
-    </item>
-    <item>
-      <title>Test</title>
-      <link>https://zhu1ang.github.io/post/test/</link>
-      <pubDate>Mon, 08 Jul 2024 19:06:24 +0800</pubDate>
-      <guid>https://zhu1ang.github.io/post/test/</guid>
-      <description>this is a real test</description>
-    </item>
-    <item>
-      <title>About</title>
-      <link>https://zhu1ang.github.io/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://zhu1ang.github.io/about/</guid>
-      <description>余求学于金陵某学府，攻读硕士之业。吾自知才浅学疏，网安之事弗知一二，故无所求但期遇一明师指点一二使吾不致枉费十数年求学之功也。&#xD;​&#x9;然世事无常，人事多艰，吾虽再三思量却终身陷囹圄。吾所从之师，其形貌似人而所行之事比之狼豺野狗更甚。其平素不示以难，不指以困，反责吾等劳作之量甚微未及其预期也。更甚者，酬饷必延半载而后放，且斤斤计较、锱铢必较，师生之情全如商旅之事耳。暑假期间，犹命吾等加班不息，且督促倍加，以促进度。呜呼哀哉，是为吾与诸同窗之大不幸！&#xA;​&#x9;然余志在自强，冀望凭己绵薄之力，精一二之计术，辅日后之工作矣。此间所录，乃余学习之笔记，望能时时温故，悟新理，日新月异，以期小流积之成海、沙砾类之成山。顽石历经千磨虽不能成玉，然必有玉珏圆润清朗之光泽也。其中亦有吾之杂感随笔，权且聊以自娱，消磨闲暇，贻笑大方，深自惴惴。</description>
     </item>
   </channel>
 </rss>
