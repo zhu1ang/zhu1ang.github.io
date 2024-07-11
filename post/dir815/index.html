@@ -107,7 +107,7 @@ binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi
   <title>clock</title>
   <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
 </svg>
-          2 min read
+          4 min read
         </div>
         <div>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tag">
@@ -238,7 +238,181 @@ binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi
 <p>故此处应使用ROP+shellcode方法</p>
 <p>exp：</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"></code></pre></div><h4 id="32-qemu系统模式复现">3.2 qemu系统模式复现</h4>
-
+<ol>
+<li><strong>用户模式（User Mode）</strong>：
+<ul>
+<li>用户模式通常指的是在操作系统的用户空间下运行的程序或进程。在这种模式下，QEMU 可以模拟一个用户级别的环境，但不会涉及到底层的硬件操作或系统调用。</li>
+<li>在用户模式下，程序的运行受到操作系统的隔离和限制，无法直接访问硬件设备或执行系统级操作。</li>
+</ul>
+</li>
+<li><strong>系统模式（System Mode）</strong>：
+<ul>
+<li>系统模式，也称为&quot;全系统仿真&quot;（Full System Emulation），指的是 QEMU 模拟整个计算机系统，包括 CPU、内存、硬盘、网络设备等硬件组件。</li>
+<li>在这种模式下，QEMU 可以运行完整的操作系统镜像，允许用户像在真实硬件上一样启动和使用操作系统。</li>
+<li>系统模式提供了更接近真实环境的测试和开发平台，适用于操作系统开发、硬件兼容性测试、安全研究等场景。</li>
+</ul>
+</li>
+</ol>
+<p>两者的主要区别在于仿真的范围和深度：</p>
+<ul>
+<li>用户模式更侧重于应用程序层面的仿真，适用于开发和测试应用程序。</li>
+<li>系统模式提供了更全面的仿真环境，包括硬件和操作系统层面，适用于底层开发和系统级测试。</li>
+</ul>
+<h5 id="321-配置qemu网络设置">3.2.1 配置qemu网络设置</h5>
+<p>首先需要下载qemu虚拟机镜像文件：[qemu mips](<a href="https://people.debian.org/~aurel32/qemu/">Index of /~aurel32/qemu (debian.org)</a>)</p>
+<p>然后使用启动脚本启动qemu虚拟机，并配置网络</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e">#! /bin/sh  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>echo <span style="color:#e6db74">&#34;config net&#34;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># 1</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># 这两句不能断开</span>
+</span></span><span style="display:flex;"><span>brctl addbr br0
+</span></span><span style="display:flex;"><span> ifconfig br0 up
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># or</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">#ip link set br0 up</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># 2</span>
+</span></span><span style="display:flex;"><span> brctl addif br0 ens33
+</span></span><span style="display:flex;"><span> ifconfig ens33 0.0.0.0
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># or</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">#ip addr add 0.0.0.0 dev ens33</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># 3</span>
+</span></span><span style="display:flex;"><span>dhclient br0
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># 4</span>
+</span></span><span style="display:flex;"><span> tunctl -t tap0 -u <span style="color:#e6db74">`</span>whoami<span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span> ifconfig tap0 up
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># or</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">#ip link set tap0 up</span>
+</span></span><span style="display:flex;"><span> brctl addif br0 tap0
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># 5</span>
+</span></span><span style="display:flex;"><span> echo <span style="color:#e6db74">&#34;qemu start &#34;</span>
+</span></span><span style="display:flex;"><span> sudo qemu-system-mipsel -M malta -kernel ./vmlinux-3.2.0-4-4kc-malta -hda ./debian_squeeze_mipsel_standard.qcow2 -append <span style="color:#e6db74">&#34;root=/dev/sda1 console=tty0&#34;</span> -net nic -net tap,ifname<span style="color:#f92672">=</span>tap0,script<span style="color:#f92672">=</span>no,downscript<span style="color:#f92672">=</span>no -nographic
+</span></span></code></pre></div><p>等待启动完成，qemu的默认登录为：root/root，登录后使用ifconfig查看网卡信息——如果此时eth0网卡存在但没有IP，可以使用<strong>ifconfig eth0 ip/24 up</strong>手动分配ip，注意要和宿主机在同一网卡下。</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407111459768.png?x-oss-process=style/zzz" alt="image-20240711145923567"></p>
+<p>互相测试能否ping通</p>
+<h5 id="322-上传固件">3.2.2 上传固件</h5>
+<p>需要在qemu虚拟机使用chroot切换根目录，并执行shell，因此需要将物理机中解压出来的文件系统上传到qemu虚拟机中。</p>
+<pre tabindex="0"><code>scp -r squashfs-root/ root@qemu_IP:/path/
+</code></pre><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407111520802.png?x-oss-process=style/zzz" alt="image-20240711152008625"></p>
+<h5 id="323开启httpd服务">3.2.3开启httpd服务</h5>
+<p>在<code>qemu</code>虚拟机的<code>squashfs-root</code>目录下新建一个<code>http_conf</code>配置文件，里面写入（注意修改49行的ip）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>Umask <span style="color:#ae81ff">026</span>
+</span></span><span style="display:flex;"><span>PIDFile <span style="color:#f92672">/</span>var<span style="color:#f92672">/</span>run<span style="color:#f92672">/</span>httpd.pid
+</span></span><span style="display:flex;"><span>LogGMT On  <span style="color:#960050;background-color:#1e0010">#开启</span>log
+</span></span><span style="display:flex;"><span>ErrorLog <span style="color:#f92672">/</span>log <span style="color:#960050;background-color:#1e0010">#</span>log文件
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>Tuning
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    NumConnections <span style="color:#ae81ff">15</span>
+</span></span><span style="display:flex;"><span>    BufSize <span style="color:#ae81ff">12288</span>
+</span></span><span style="display:flex;"><span>    InputBufSize <span style="color:#ae81ff">4096</span>
+</span></span><span style="display:flex;"><span>    ScriptBufSize <span style="color:#ae81ff">4096</span>
+</span></span><span style="display:flex;"><span>    NumHeaders <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>    Timeout <span style="color:#ae81ff">60</span>
+</span></span><span style="display:flex;"><span>    ScriptTimeout <span style="color:#ae81ff">60</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>Control
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Types
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        text<span style="color:#f92672">/</span>html    { html htm }
+</span></span><span style="display:flex;"><span>        text<span style="color:#f92672">/</span>xml    { xml }
+</span></span><span style="display:flex;"><span>        text<span style="color:#f92672">/</span>plain    { txt }
+</span></span><span style="display:flex;"><span>        image<span style="color:#f92672">/</span>gif    { gif }
+</span></span><span style="display:flex;"><span>        image<span style="color:#f92672">/</span>jpeg    { jpg }
+</span></span><span style="display:flex;"><span>        text<span style="color:#f92672">/</span>css    { css }
+</span></span><span style="display:flex;"><span>        application<span style="color:#f92672">/</span>octet<span style="color:#f92672">-</span>stream { <span style="color:#f92672">*</span> }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    Specials
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        Dump        { <span style="color:#f92672">/</span>dump }
+</span></span><span style="display:flex;"><span>        CGI            { cgi }
+</span></span><span style="display:flex;"><span>        Imagemap    { map }
+</span></span><span style="display:flex;"><span>        Redirect    { url }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    External
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>sbin<span style="color:#f92672">/</span>phpcgi { php }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>Server
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    ServerName <span style="color:#e6db74">&#34;Linux, HTTP/1.1, &#34;</span>
+</span></span><span style="display:flex;"><span>    ServerId <span style="color:#e6db74">&#34;1234&#34;</span>
+</span></span><span style="display:flex;"><span>    Family inet
+</span></span><span style="display:flex;"><span>    Interface eth0 <span style="color:#960050;background-color:#1e0010">#对应</span>qemu仿真路由器系统的网卡
+</span></span><span style="display:flex;"><span>    Address <span style="color:#ae81ff">192.168.182.6</span> <span style="color:#960050;background-color:#1e0010">#</span>qemu仿真路由器系统的IP
+</span></span><span style="display:flex;"><span>    Port <span style="color:#e6db74">&#34;1234&#34;</span> <span style="color:#960050;background-color:#1e0010">#对应未被使用的端口</span>
+</span></span><span style="display:flex;"><span>    Virtual
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        AnyHost
+</span></span><span style="display:flex;"><span>        Control
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            Alias <span style="color:#f92672">/</span>
+</span></span><span style="display:flex;"><span>            Location <span style="color:#f92672">/</span>htdocs<span style="color:#f92672">/</span>web
+</span></span><span style="display:flex;"><span>            IndexNames { index.php }
+</span></span><span style="display:flex;"><span>            External
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>sbin<span style="color:#f92672">/</span>phpcgi { router_info.xml }
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>sbin<span style="color:#f92672">/</span>phpcgi { post_login.xml }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        Control
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            Alias <span style="color:#f92672">/</span>HNAP1
+</span></span><span style="display:flex;"><span>            Location <span style="color:#f92672">/</span>htdocs<span style="color:#f92672">/</span>HNAP1
+</span></span><span style="display:flex;"><span>            External
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>sbin<span style="color:#f92672">/</span>hnap { hnap }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            IndexNames { index.hnap }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h5 id="324开启物理机转发功能">3.2.4开启物理机转发功能</h5>
+<p>在宿主机中新建以下net_conf_host.sh脚本并执行：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e">#! /bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> sudo sysctl -w net.ipv4.ip_forward<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span> sudo iptables -F
+</span></span><span style="display:flex;"><span> sudo iptables -X
+</span></span><span style="display:flex;"><span> sudo iptables -t nat -F
+</span></span><span style="display:flex;"><span> sudo iptables -t nat -X
+</span></span><span style="display:flex;"><span> sudo iptables -t mangle -F
+</span></span><span style="display:flex;"><span> sudo iptables -t mangle -X
+</span></span><span style="display:flex;"><span> sudo iptables -P INPUT ACCEPT
+</span></span><span style="display:flex;"><span> sudo iptables -P FORWARD ACCEPT
+</span></span><span style="display:flex;"><span> sudo iptables -P OUTPUT ACCEPT
+</span></span><span style="display:flex;"><span> sudo iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
+</span></span><span style="display:flex;"><span> sudo iptables -I FORWARD <span style="color:#ae81ff">1</span> -i tap0 -j ACCEPT
+</span></span><span style="display:flex;"><span> sudo iptables -I FORWARD <span style="color:#ae81ff">1</span> -o tap0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+</span></span></code></pre></div><p>之后，再在qemu虚拟机的squashfs-root目录下创建init.sh的脚本进行初始化操作：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>echo <span style="color:#ae81ff">0</span> &gt; /proc/sys/kernel/randomize_va_space
+</span></span><span style="display:flex;"><span>cp http_conf /
+</span></span><span style="display:flex;"><span>cp sbin/httpd /
+</span></span><span style="display:flex;"><span>cp -rf htdocs/ /
+</span></span><span style="display:flex;"><span>mkdir /etc_bak
+</span></span><span style="display:flex;"><span>cp -r /etc /etc_bak
+</span></span><span style="display:flex;"><span>rm /etc/services
+</span></span><span style="display:flex;"><span>cp -rf etc/ /
+</span></span><span style="display:flex;"><span>cp lib/ld-uClibc-0.9.30.1.so  /lib/
+</span></span><span style="display:flex;"><span>cp lib/libcrypt-0.9.30.1.so  /lib/
+</span></span><span style="display:flex;"><span>cp lib/libc.so.0  /lib/
+</span></span><span style="display:flex;"><span>cp lib/libgcc_s.so.1  /lib/
+</span></span><span style="display:flex;"><span>cp lib/ld-uClibc.so.0  /lib/
+</span></span><span style="display:flex;"><span>cp lib/libcrypt.so.0  /lib/
+</span></span><span style="display:flex;"><span>cp lib/libgcc_s.so  /lib/
+</span></span><span style="display:flex;"><span>cp lib/libuClibc-0.9.30.1.so  /lib/
+</span></span><span style="display:flex;"><span>cd /
+</span></span><span style="display:flex;"><span>rm -rf /htdocs/web/hedwig.cgi
+</span></span><span style="display:flex;"><span>rm -rf /usr/sbin/phpcgi
+</span></span><span style="display:flex;"><span>rm -rf /usr/sbin/hnap
+</span></span><span style="display:flex;"><span>ln -s /htdocs/cgibin /htdocs/web/hedwig.cgi
+</span></span><span style="display:flex;"><span>ln -s /htdocs/cgibin /usr/sbin/phpcgi
+</span></span><span style="display:flex;"><span>ln -s  /htdocs/cgibin /usr/sbin/hnap
+</span></span><span style="display:flex;"><span>./httpd -f http_conf
+</span></span></code></pre></div>
     </div>
     <div class="post-footer">
       
