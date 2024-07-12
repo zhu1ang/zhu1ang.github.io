@@ -412,7 +412,22 @@ binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi
 </span></span><span style="display:flex;"><span>ln -s /htdocs/cgibin /usr/sbin/phpcgi
 </span></span><span style="display:flex;"><span>ln -s  /htdocs/cgibin /usr/sbin/hnap
 </span></span><span style="display:flex;"><span>./httpd -f http_conf
-</span></span></code></pre></div>
+</span></span></code></pre></div><p>通过以下命令切换根目录</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mount -o bind /dev ./squashfs-root/dev/
+</span></span><span style="display:flex;"><span> mount -t proc /proc/ ./squashfs-root/proc/
+</span></span><span style="display:flex;"><span>chroot squashfs-root bash
+</span></span></code></pre></div><p>但是squashfs-root目录下并无bash，静态编译一个mips架构的bash放进去。</p>
+<p>如果报错没有PID文件，自己手动创建一个文件，只要PID不和已有的重复就行。</p>
+<p>最后，启动init.sh脚本，开启httpd服务</p>
+<p>此时在物理机中访问 qemu_IP/hedwig.cgi，如图：</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407121538462.png?x-oss-process=style/zzz" alt="image-20240712153756659"></p>
+<p>出现上图，则说明配置成功。最后，退出qemu虚拟机的时候，运行fin.sh的脚本恢复/etc文件夹,否则后续qemu会打不开：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>rm -rf /etc
+</span></span><span style="display:flex;"><span>mv /etc_bak/etc /etc
+</span></span><span style="display:flex;"><span>rm -rf /etc_bak
+</span></span></code></pre></div><h5 id="325-复现">3.2.5 复现</h5>
+
     </div>
     <div class="post-footer">
       
