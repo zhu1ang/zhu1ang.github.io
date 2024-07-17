@@ -1,0 +1,8 @@
+body {
+    font-family: 'YourCustomFont', sans-serif;
+    font-size: 16px; /* 根据需要调整大小 */
+    
+}
+p {
+    text-indent: 2em; /* 设置首行缩进为两个字 */
+}
