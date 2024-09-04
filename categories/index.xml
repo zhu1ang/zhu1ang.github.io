@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Categories on 江南酒与燕赵歌</title>
-    <link>https://zhu1ang.github.io/categories/</link>
-    <description>Recent content in Categories on 江南酒与燕赵歌</description>
-    <generator>Hugo</generator>
-    <language>zh</language>
-    <atom:link href="https://zhu1ang.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
-  </channel>
+    <channel>
+        <title>Categories on 剑饮雪</title>
+        <link>https://zhu1ang.github.io/categories/</link>
+        <description>Recent content in Categories on 剑饮雪</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>zhu1ang</copyright>
+        <lastBuildDate>Wed, 04 Sep 2024 16:42:46 +0800</lastBuildDate><atom:link href="https://zhu1ang.github.io/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>学习笔记</title>
+        <link>https://zhu1ang.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+        <pubDate>Wed, 04 Sep 2024 16:42:46 +0800</pubDate>
+        
+        <guid>https://zhu1ang.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>江湖杂谈</title>
+        <link>https://zhu1ang.github.io/categories/%E6%B1%9F%E6%B9%96%E6%9D%82%E8%B0%88/</link>
+        <pubDate>Wed, 04 Sep 2024 16:41:33 +0800</pubDate>
+        
+        <guid>https://zhu1ang.github.io/categories/%E6%B1%9F%E6%B9%96%E6%9D%82%E8%B0%88/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
 </rss>

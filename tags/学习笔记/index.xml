@@ -2,38 +2,38 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>学习笔记 on 江南酒与燕赵歌</title>
-    <link>https://zhu1ang.github.io/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+    <link>http://localhost:1313/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
     <description>Recent content in 学习笔记 on 江南酒与燕赵歌</description>
     <generator>Hugo</generator>
     <language>zh</language>
     <lastBuildDate>Mon, 22 Jul 2024 15:10:00 +0800</lastBuildDate>
-    <atom:link href="https://zhu1ang.github.io/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>虚拟机shell获取</title>
-      <link>https://zhu1ang.github.io/post/%E8%99%9A%E6%8B%9F%E6%9C%BAshell%E8%8E%B7%E5%8F%96/</link>
+      <link>http://localhost:1313/post/%E8%99%9A%E6%8B%9F%E6%9C%BAshell%E8%8E%B7%E5%8F%96/</link>
       <pubDate>Mon, 22 Jul 2024 15:10:00 +0800</pubDate>
-      <guid>https://zhu1ang.github.io/post/%E8%99%9A%E6%8B%9F%E6%9C%BAshell%E8%8E%B7%E5%8F%96/</guid>
+      <guid>http://localhost:1313/post/%E8%99%9A%E6%8B%9F%E6%9C%BAshell%E8%8E%B7%E5%8F%96/</guid>
       <description></description>
     </item>
     <item>
       <title>【栈溢出】TEW752漏洞复现</title>
-      <link>https://zhu1ang.github.io/post/tew752/</link>
+      <link>http://localhost:1313/post/tew752/</link>
       <pubDate>Fri, 19 Jul 2024 15:47:43 +0800</pubDate>
-      <guid>https://zhu1ang.github.io/post/tew752/</guid>
+      <guid>http://localhost:1313/post/tew752/</guid>
       <description>前期准备 固件下载链接：TEW752&#xA;静态分析 根据漏洞通报里的描述，漏洞存在于cgibin程序的genacgi_main函数，把cgibin放到IDA里分析&#xA;函数比较简单，可能存在漏洞的点只能是在两个if的分支判断里，在request_method为UNSUBSCRIBE时，可以看到sprintf这个危险函数是没有进行长度检查的，并且v2(HTTP_SID)以及a1(SERVICE)都是可控的，可以注入恶意数据利用漏洞。&#xA;但是，在路由器的文件系统中却并没有gena.cgi文件，所以不能通过qemu用户模式模拟来复现&#xA;同时，在文件系统中搜索gena.cgi，除了cgibin程序就是几个web层面的php文件&#xA;分析几个php文件，defnodes文件夹下的几个php文件只是设置事件订阅的URL，在httpsvcs.php文件中可以看到gena.cgi和UPNP服务有关：&#xA;并且upnpsetup函数会在接收请求后创建gena.cgi等文件，upnpsetup函数中还可以看到，可以通过49152端口向UPNP发送数据：&#xA;考虑构造一个特定的HTTP UNSUBSCRIBE请求，其中包含足够长的数据，使得 sprintf 函数写入超过 v5 （512）缓冲区的范围，从而触发栈溢出。&#xA;模拟路由器环境&#xA;构造HTTP请求（溢出HTTP_SID/SERVICE）&#xA;TCP scoket来发送请求&#xA;路由器模拟 使用FirmAE工具进行路由器固件的模拟。注意：FirmAE的安装需要走代理——Ubuntu里开代理或者主机Windows开全局代理模式，并且初次模拟固件时间较长，可能会误以为模拟失败。&#xA;动态调试 1 测偏移 先用cyclic 2000 &amp;gt; test生成测试字符到test文件，再用如下脚本启动qemu用户模式&#xA;#!/bin/bash service=&amp;#34;?service=`cat test`&amp;#34; qemu-mipsel-static -L ./ -g 1234 -0 &amp;#34;gena.cgi&amp;#34; -E REQUEST_METHOD=&amp;#34;UNSUBSCRIBE&amp;#34; -E REQUEST_URI=$service -E HTTP_SID=1 -E SERVER_ID=LAN-3 -E REMOTE_ADDR=&amp;#34;192.168.182.14&amp;#34; ./htdocs/cgibin 使用gdb连接上之后，直接c，让其溢出，然后可以测得偏移为474&#xA;2 找基址 由于使用vmmap命令无法得到libc的基址&#xA;所以，这里仍然根据延迟绑定机制来计算libc的基址&#xA;0x3ff8a060 - 0x52060 = 0x3ff38000&#xA;所以vmmap查看得到的，&amp;lt; explored &amp;gt;文件就是libc的基址&#xA;3 找gadget 考虑利用system函数来得到shell&#xA;mipsrop.stackfinder() 选择0x16824处的gadget&#xA;$sp + 0x10传给$s5，在0x16838处又赋值给$a0，$a0作为函数传参的寄存器，要存放cmd</description>
     </item>
     <item>
       <title>[学习笔记]CGI固件分析</title>
-      <link>https://zhu1ang.github.io/post/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+      <link>http://localhost:1313/post/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
       <pubDate>Wed, 17 Jul 2024 18:55:32 +0800</pubDate>
-      <guid>https://zhu1ang.github.io/post/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+      <guid>http://localhost:1313/post/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
       <description></description>
     </item>
     <item>
       <title>【栈溢出】DIR-815漏洞复现</title>
-      <link>https://zhu1ang.github.io/post/dir815/</link>
+      <link>http://localhost:1313/post/dir815/</link>
       <pubDate>Thu, 11 Jul 2024 10:15:39 +0800</pubDate>
-      <guid>https://zhu1ang.github.io/post/dir815/</guid>
+      <guid>http://localhost:1313/post/dir815/</guid>
       <description>1 环境准备 固件下载链接：DLink下载&#xA;物理机：Ubuntu 20.04 （需安装binwalk、qemu、pwntools等）&#xA;反汇编共工具：IDA Pro&#xA;2 静态分析 根据已有的资料，DIR-815多重栈溢出漏洞和前端的超长cookie有关，并且漏洞文件为 hedweb.cgi&#xA;首先对固件进行解包&#xA;binwalk -Me xxx.bin 找到漏洞文件路径：/htdocs/web/hedwig.cgi&#xA;是/htdocs/cgibin的软链接，因此，使用IDA逆向分析cgibin&#xA;在main函数中可以看到，此处为hedwigcgi_main函数分支&#xA;另外根据cgi-bin的架构和常用的变量，若要操作cookie，需使用getenv(&amp;quot;HTTP_COOKIE&amp;quot;)&#xA;直接搜索&amp;quot;HTTP_COOKIE&amp;quot;字符串，根据交叉引用，只有sess_get_uid这个函数使用了这 个字符串&#xA;继续通过交叉引用回溯，发现在hedwigcgi_main调用了这个函数&#xA;并且两次调用了sprintf这个危险函数，两次拼接使用的字符串都是sess_get_uid处理之后的v4，分析sess_get_uid函数可知，v4是COOKIE中的uid的值。&#xA;如果能走到第二个sprintf函数，则会覆盖上一次拼接的内容，则第二处sprintf是溢出点&#xA;两个判断需要满足的条件为：存在/var/tmp 目录以及环境变量REQUEST_URI不为空。&#xA;由于固件解包后不存在/var/tmp目录，故需要自己创建，否则后续测试偏移时由于无法走到第二个sprintf函数会出错。&#xA;3 动态调试 3.1 qemu用户模式复现 #!/bin/sh INPUT=&amp;#34;uid=1234&amp;#34; TEST=&amp;#34;uid=1234`cat payload`&amp;#34; LEN=$(echo -n &amp;#34;INPUT&amp;#34; |wc -c) PORT=&amp;#34;1234&amp;#34; cd ./squashfs-root cp $(which qemu-mipsel-static) ./qemu echo $INPUT | chroot . ./qemu -E CONTENT_LENGTH=$LEN -E CONTENT_TYPE=&amp;#34;application/x-www-form-urlencoded&amp;#34; -E REQUEST_METHOD=&amp;#34;POST&amp;#34; -E HTTP_COOKIE=$TEST -E REQUEST_URI=&amp;#34;/hedwig.cgi&amp;#34; -g $PORT /htdocs/web/hedwig.cgi rm -f ./qemu 用以上脚本启动qemu模拟CGI程序，其中</description>
     </item>
   </channel>

