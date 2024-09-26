@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="跟随吾爱带佬学习">
+<title>安卓逆向入门（二）</title>
+
+<link rel='canonical' href='https://zhu1ang.github.io/p/52study_2/'>
+
+<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="安卓逆向入门（二）">
+<meta property='og:description' content="跟随吾爱带佬学习">
+<meta property='og:url' content='https://zhu1ang.github.io/p/52study_2/'>
+<meta property='og:site_name' content='剑饮雪'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='安卓逆向' /><meta property='article:tag' content='学习笔记' /><meta property='article:published_time' content='2024-09-14T21:39:03&#43;08:00'/><meta property='article:modified_time' content='2024-09-14T21:39:03&#43;08:00'/>
+<meta name="twitter:title" content="安卓逆向入门（二）">
+<meta name="twitter:description" content="跟随吾爱带佬学习">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Ukenn2112/UkennWeb@3.0/index/web.js"></script>
+        <div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ico_hu627d1395d31b147b1726fc8be242e34e_39784_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">剑饮雪</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/zhu1ang'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#smali及其语法">smali及其语法</a></li>
+            <li><a href="#smali代码分析">smali代码分析</a></li>
+            <li><a href="#实战修改">实战修改</a></li>
+            <li><a href="#其他">其他</a></li>
+            <li><a href="#参考">参考</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" >
+                安卓逆向
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/52study_2/">安卓逆向入门（二）</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            跟随吾爱带佬学习
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 14, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h4 id="smali及其语法">smali及其语法
+</h4><p>​	smali是由dex反编译得到的，不能直接修改java代码，而是修改smali代码。</p>
+<p>关键字</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>.class</th>
+<th>类名</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.super</td>
+<td>父类名，继承的上级类名名称</td>
+</tr>
+<tr>
+<td>.source</td>
+<td>源名</td>
+</tr>
+<tr>
+<td>.field</td>
+<td>变量</td>
+</tr>
+<tr>
+<td>.method</td>
+<td>方法名</td>
+</tr>
+<tr>
+<td>.register</td>
+<td>寄存器</td>
+</tr>
+<tr>
+<td>.end method</td>
+<td>方法名的结束</td>
+</tr>
+<tr>
+<td>public</td>
+<td>公有</td>
+</tr>
+<tr>
+<td>protected</td>
+<td>半公开，只有同一家人才能用</td>
+</tr>
+<tr>
+<td>private</td>
+<td>私有，只能自己使用</td>
+</tr>
+<tr>
+<td>.parameter</td>
+<td>方法参数</td>
+</tr>
+<tr>
+<td>.prologue</td>
+<td>方法开始</td>
+</tr>
+<tr>
+<td>.line xxx</td>
+<td>位于第xxx行</td>
+</tr>
+</tbody>
+</table></div>
+<p>数据类型对应</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>V</th>
+<th>void</th>
+<th>无返回值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Z</td>
+<td>boolean</td>
+<td>布尔值类型，返回0或1</td>
+</tr>
+<tr>
+<td>B</td>
+<td>byte</td>
+<td>字节类型，返回字节</td>
+</tr>
+<tr>
+<td>S</td>
+<td>short</td>
+<td>短整数类型，返回数字</td>
+</tr>
+<tr>
+<td>C</td>
+<td>char</td>
+<td>字符类型，返回字符</td>
+</tr>
+<tr>
+<td>I</td>
+<td>int</td>
+<td>整数类型，返回数字</td>
+</tr>
+<tr>
+<td>J</td>
+<td>long （64位 需要2个寄存器存储）</td>
+<td>长整数类型，返回数字</td>
+</tr>
+<tr>
+<td>F</td>
+<td>float</td>
+<td>单浮点类型，返回数字</td>
+</tr>
+<tr>
+<td>D</td>
+<td>double （64位 需要2个寄存器存储）</td>
+<td>双浮点类型，返回数字</td>
+</tr>
+<tr>
+<td>string</td>
+<td>String</td>
+<td>文本类型，返回字符串</td>
+</tr>
+<tr>
+<td>Lxxx/xxx/xxx</td>
+<td>object</td>
+<td>对象类型，返回对象</td>
+</tr>
+</tbody>
+</table></div>
+<p>常用指令</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>const</th>
+<th>重写整数属性，真假属性内容，只能是数字类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>const-string</td>
+<td>重写字符串内容</td>
+</tr>
+<tr>
+<td>const-wide</td>
+<td>重写长整数类型，多用于修改到期时间。</td>
+</tr>
+<tr>
+<td>return</td>
+<td>返回指令</td>
+</tr>
+<tr>
+<td>if-eq</td>
+<td>全称equal(a=b)，比较寄存器ab内容，相同则跳</td>
+</tr>
+<tr>
+<td>if-ne</td>
+<td>全称not equal(a!=b)，ab内容不相同则跳</td>
+</tr>
+<tr>
+<td>if-eqz</td>
+<td>全称equal zero(a=0)，z即是0的标记，a等于0则跳</td>
+</tr>
+<tr>
+<td>if-nez</td>
+<td>全称not equal zero(a!=0)，a不等于0则跳</td>
+</tr>
+<tr>
+<td>if-ge</td>
+<td>全称greater equal(a&gt;=b)，a大于或等于则跳</td>
+</tr>
+<tr>
+<td>if-le</td>
+<td>全称little equal(a&lt;=b)，a小于或等于则跳</td>
+</tr>
+<tr>
+<td>goto</td>
+<td>强制跳到指定位置</td>
+</tr>
+<tr>
+<td>switch</td>
+<td>分支跳转，一般会有多个分支线，并根据指令跳转到适当位置</td>
+</tr>
+<tr>
+<td>iget</td>
+<td>获取寄存器数据</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="smali代码分析">smali代码分析
+</h4><p>demo的第二关</p>
+<img src="C:\Users\zhulang\AppData\Local\Microsoft\Windows\INetCache\IE\IQ8P8G5I\Screenshot_20240914-220042[1].jpg" alt="Screenshot_20240914-220042[1]" style="zoom:25%;" />
+<p>目标是一键三连，但是提示需要获取大会员，尝试修改smali代码。</p>
+<p>首先使用jadx反编译然后搜索特定字符串(jadx抽风了，这里改用jeb)，定位到字符串的位置，同时可以按tab键查看对应的java代码</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142230895.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240914223054827"
+	
+	
+></p>
+<h4 id="实战修改">实战修改
+</h4><h5 id="修改判断">修改判断
+</h5><p>理清修改的逻辑</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-smali" data-lang="smali"><span class="line"><span class="cl"><span class="mi">00000000</span><span class="w">  </span>iget<span class="w">                </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="err">Ref$</span><span class="kt">I</span><span class="err">ntRef</span><span class="p">-&gt;</span><span class="nv">element</span><span class="p">:</span><span class="kt">I</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000004</span><span class="w">  </span>const/4<span class="w">             </span><span class="nb">p5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000006</span><span class="w">  </span>const/16<span class="w">            </span><span class="nb">v0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000000</span><span class="err">A</span><span class="w">  </span>if-ge<span class="w">               </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="nb">v0</span><span class="p">,</span><span class="w"> </span><span class="nl">:2A</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nl">:E</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000000</span><span class="err">E</span><span class="w">  </span>move-object<span class="w">         </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="nb">p1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000010</span><span class="w">  </span>check-cast<span class="w">          </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">ontext</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000014</span><span class="w">  </span>const-string<span class="w">        </span><span class="nb">v0</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;请先获取10个硬币哦&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000018</span><span class="w">  </span>check-cast<span class="w">          </span><span class="nb">v0</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">har</span><span class="kt">S</span><span class="err">equence</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000001</span><span class="kt">C</span><span class="w">  </span>invoke-static<span class="w">       </span><span class="err">Toast</span><span class="p">-&gt;</span><span class="nf">makeText</span><span class="p">(</span><span class="kt">C</span><span class="err">ontext</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">har</span><span class="kt">S</span><span class="err">equence</span><span class="p">,</span><span class="w"> </span><span class="kt">I</span><span class="p">)</span><span class="err">Toast</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="nb">v0</span><span class="p">,</span><span class="w"> </span><span class="nb">p5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000022</span><span class="w">  </span>move-result-object<span class="w">  </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000024</span><span class="w">  </span>invoke-virtual<span class="w">      </span><span class="err">Toast</span><span class="p">-&gt;</span><span class="nf">show</span><span class="p">()</span><span class="kt">V</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nl">:2A</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000002</span><span class="err">A</span><span class="w">  </span>invoke-virtual<span class="w">      </span><span class="kt">C</span><span class="err">hallenge</span><span class="kt">S</span><span class="err">econd</span><span class="p">-&gt;</span><span class="nf">isvip</span><span class="p">()</span><span class="kt">Z</span><span class="p">,</span><span class="w"> </span><span class="nb">p1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000030</span><span class="w">  </span>move-result<span class="w">         </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000032</span><span class="w">  </span>if-eqz<span class="w">              </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="nl">:86</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nl">:36</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000036</span><span class="w">  </span>check-cast<span class="w">          </span><span class="nb">p1</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">ontext</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000003</span><span class="err">A</span><span class="w">  </span>const-string<span class="w">        </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;当前已经是大会员了哦！&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000003</span><span class="err">E</span><span class="w">  </span>check-cast<span class="w">          </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">har</span><span class="kt">S</span><span class="err">equence</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000042</span><span class="w">  </span>invoke-static<span class="w">       </span><span class="err">Toast</span><span class="p">-&gt;</span><span class="nf">makeText</span><span class="p">(</span><span class="kt">C</span><span class="err">ontext</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">har</span><span class="kt">S</span><span class="err">equence</span><span class="p">,</span><span class="w"> </span><span class="kt">I</span><span class="p">)</span><span class="err">Toast</span><span class="p">,</span><span class="w"> </span><span class="nb">p1</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="nb">p5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000048</span><span class="w">  </span>move-result-object<span class="w">  </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000004</span><span class="err">A</span><span class="w">  </span>invoke-virtual<span class="w">      </span><span class="err">Toast</span><span class="p">-&gt;</span><span class="nf">show</span><span class="p">()</span><span class="kt">V</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000050</span><span class="w">  </span>const<span class="w">               </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x7F0D0018</span><span class="w">        </span><span class="c"># mipmap:zan_active
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="mi">00000056</span><span class="w">  </span>invoke-virtual<span class="w">      </span><span class="kt">I</span><span class="err">mage</span><span class="kt">V</span><span class="err">iew</span><span class="p">-&gt;</span><span class="nf">setImageResource</span><span class="p">(</span><span class="kt">I</span><span class="p">)</span><span class="kt">V</span><span class="p">,</span><span class="w"> </span><span class="nb">p2</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000005</span><span class="kt">C</span><span class="w">  </span>const<span class="w">               </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x7F0D0008</span><span class="w">        </span><span class="c"># mipmap:coin_active
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="mi">00000062</span><span class="w">  </span>invoke-virtual<span class="w">      </span><span class="kt">I</span><span class="err">mage</span><span class="kt">V</span><span class="err">iew</span><span class="p">-&gt;</span><span class="nf">setImageResource</span><span class="p">(</span><span class="kt">I</span><span class="p">)</span><span class="kt">V</span><span class="p">,</span><span class="w"> </span><span class="nb">p3</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000068</span><span class="w">  </span>const<span class="w">               </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x7F0D000A</span><span class="w">        </span><span class="c"># mipmap:collect_active
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="mi">0000006</span><span class="err">E</span><span class="w">  </span>invoke-virtual<span class="w">      </span><span class="kt">I</span><span class="err">mage</span><span class="kt">V</span><span class="err">iew</span><span class="p">-&gt;</span><span class="nf">setImageResource</span><span class="p">(</span><span class="kt">I</span><span class="p">)</span><span class="kt">V</span><span class="p">,</span><span class="w"> </span><span class="nb">p4</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000074</span><span class="w">  </span>sget-object<span class="w">         </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="kt">S</span><span class="err">PUtils</span><span class="p">-&gt;</span><span class="nv">INSTANCE</span><span class="p">:</span><span class="kt">S</span><span class="err">PUtils</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000078</span><span class="w">  </span>const/4<span class="w">             </span><span class="nb">p2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000007</span><span class="err">A</span><span class="w">  </span>const-string<span class="w">        </span><span class="nb">p3</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;level&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000007</span><span class="err">E</span><span class="w">  </span>invoke-virtual<span class="w">      </span><span class="kt">S</span><span class="err">PUtils</span><span class="p">-&gt;</span><span class="nf">saveInt</span><span class="p">(</span><span class="kt">C</span><span class="err">ontext</span><span class="p">,</span><span class="w"> </span><span class="kt">S</span><span class="err">tring</span><span class="p">,</span><span class="w"> </span><span class="kt">I</span><span class="p">)</span><span class="kt">V</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="nb">p1</span><span class="p">,</span><span class="w"> </span><span class="nb">p3</span><span class="p">,</span><span class="w"> </span><span class="nb">p2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000084</span><span class="w">  </span>goto<span class="w">                </span><span class="nl">:A0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nl">:86</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000086</span><span class="w">  </span>check-cast<span class="w">          </span><span class="nb">p1</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">ontext</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000008</span><span class="err">A</span><span class="w">  </span>const-string<span class="w">        </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;请先充值大会员哦！&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000008</span><span class="err">E</span><span class="w">  </span>check-cast<span class="w">          </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">har</span><span class="kt">S</span><span class="err">equence</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000092</span><span class="w">  </span>invoke-static<span class="w">       </span><span class="err">Toast</span><span class="p">-&gt;</span><span class="nf">makeText</span><span class="p">(</span><span class="kt">C</span><span class="err">ontext</span><span class="p">,</span><span class="w"> </span><span class="kt">C</span><span class="err">har</span><span class="kt">S</span><span class="err">equence</span><span class="p">,</span><span class="w"> </span><span class="kt">I</span><span class="p">)</span><span class="err">Toast</span><span class="p">,</span><span class="w"> </span><span class="nb">p1</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="p">,</span><span class="w"> </span><span class="nb">p5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">00000098</span><span class="w">  </span>move-result-object<span class="w">  </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">0000009</span><span class="err">A</span><span class="w">  </span>invoke-virtual<span class="w">      </span><span class="err">Toast</span><span class="p">-&gt;</span><span class="nf">show</span><span class="p">()</span><span class="kt">V</span><span class="p">,</span><span class="w"> </span><span class="nb">p0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nl">:A0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">000000</span><span class="err">A</span><span class="mi">0</span><span class="w">  </span>return<span class="w">              </span><span class="nb">p5</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>首先第四行的判断是否有10个硬币，有则跳转:2A去判断是否是会员。:2A里的第16行判断是否是vip不是则跳转到:86。理清修改逻辑后去MT管理器里进行修改。</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142246058.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-224426[1]" style="zoom:25%;" /><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142246959.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-224457[1]" style="zoom:25%;" /><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142246370.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-224553[1]" style="zoom:25%;" /></p>
+<p>第一个硬币判断由&gt;=10改为&lt;=10，而对于不是大会员的跳转分支直接注释。</p>
+<h5 id="修改寄存器的值">修改寄存器的值
+</h5><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142253647.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-225102[1]" style="zoom:25%;" /><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142253990.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-225143[1]" style="zoom:25%;" /><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142254163.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-225402[1]" style="zoom:25%;" /></p>
+<p>首先第一处判断，把需要的硬币数改为0，第二处把vip判断函数的返回值直接设为1。</p>
+<h5 id="强制跳转">强制跳转
+</h5><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142311766.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-225955[1]" style="zoom:25%;" /><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142311519.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-231009[1]" style="zoom:25%;" /><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202409142312396.jpg?x-oss-process=style/zzz" alt="Screenshot_20240914-231033[1]" style="zoom:25%;" /></p>
+<p>首先第一跳转，可以直接修改goto到cond_15直接进行是否是会员的判断，而对于是否是会员判断完，添加一个goto跳转并且在是大会员的分支添加要跳转的标签。（这里也可以注释删除，但是如果代码逻辑是先判断不是大会员再else是大会员就不能这样操作）</p>
+<h4 id="其他">其他
+</h4><p>这次实战只是一个简单的栗子，对于这种技巧需要掌握应该需要多动手，多看smali，多改。</p>
+<h4 id="参考">参考
+</h4><p>吾爱教程：https://www.52pojie.cn/thread-408645-1-1.html</p>
+<p>​</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">安卓逆向</a>
+        
+            <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/52study_3/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（三）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（一）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/240910/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向学习笔记（一）</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    
+    
+    <section class="totalcount">
+    
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+    发表了10篇文章 · 
+    总计1.75k字
+    </section>
+
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<a href="#" id="back-to-top" title="返回顶部"></a>
+
+
+<style>
+  #back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 55px;
+    width: 55px;
+    height: 55px;
+    border-radius: 7px;
+    background-color: rgba(64, 158, 255, 0.5);
+    box-shadow: var(--shadow-l2);
+    font-size: 30px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+  }
+
+  #back-to-top:before {
+    content: ' ';
+    display: inline-block;
+    position: relative;
+    top: 0;
+    transform: rotate(135deg);
+    height: 10px;
+    width: 10px;
+    border-width: 0 0 2px 2px;
+    border-color: var(--back-to-top-color);
+    border-style: solid;
+  }
+
+  #back-to-top:hover:before {
+    border-color: #2674e0;
+  }
+
+   
+  @media screen and (max-width: 768px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 10px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1024px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 40px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1280px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 55px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1536px) {
+    #back-to-top {
+      visibility: hidden;
+    }
+  }
+</style>
+
+
+<script>
+  function backToTop() {
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+    })
+  }
+
+  window.onload = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop > 0) {
+      totopBtn.style.display = 'inline'
+    } else {
+      totopBtn.style.display = 'none'
+    }
+  }
+
+  window.onscroll = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop < 200) {
+      totopBtn.style.display = 'none'
+    } else {
+      totopBtn.style.display = 'inline'
+      totopBtn.addEventListener('click', backToTop, false)
+    }
+  }
+</script>
+
+    </body>
+</html>

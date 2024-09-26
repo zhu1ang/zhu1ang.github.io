@@ -7,20 +7,28 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>zhu1ang</copyright>
-        <lastBuildDate>Wed, 04 Sep 2024 16:42:46 +0800</lastBuildDate><atom:link href="https://zhu1ang.github.io/categories/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>学习笔记</title>
-        <link>https://zhu1ang.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
-        <pubDate>Wed, 04 Sep 2024 16:42:46 +0800</pubDate>
+        <lastBuildDate>Sun, 15 Sep 2024 21:07:19 +0800</lastBuildDate><atom:link href="https://zhu1ang.github.io/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>安卓逆向</title>
+        <link>https://zhu1ang.github.io/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/</link>
+        <pubDate>Sun, 15 Sep 2024 21:07:19 +0800</pubDate>
         
-        <guid>https://zhu1ang.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+        <guid>https://zhu1ang.github.io/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/</guid>
         <description></description>
         </item>
         <item>
         <title>江湖杂谈</title>
         <link>https://zhu1ang.github.io/categories/%E6%B1%9F%E6%B9%96%E6%9D%82%E8%B0%88/</link>
-        <pubDate>Wed, 04 Sep 2024 16:41:33 +0800</pubDate>
+        <pubDate>Sun, 08 Sep 2024 22:14:29 +0800</pubDate>
         
         <guid>https://zhu1ang.github.io/categories/%E6%B1%9F%E6%B9%96%E6%9D%82%E8%B0%88/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>学习笔记</title>
+        <link>https://zhu1ang.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+        <pubDate>Wed, 04 Sep 2024 16:42:46 +0800</pubDate>
+        
+        <guid>https://zhu1ang.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
         <description></description>
         </item>
         
