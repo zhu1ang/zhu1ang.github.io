@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Android相关基础简单学习">
-<title>安卓逆向学习笔记（一）</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="跟随吾爱带佬学习">
+<title>安卓逆向入门（四）</title>
 
-<link rel='canonical' href='https://zhu1ang.github.io/p/240910/'>
+<link rel='canonical' href='https://zhu1ang.github.io/p/52study_4/'>
 
-<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="安卓逆向学习笔记（一）">
-<meta property='og:description' content="Android相关基础简单学习">
-<meta property='og:url' content='https://zhu1ang.github.io/p/240910/'>
+<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="安卓逆向入门（四）">
+<meta property='og:description' content="跟随吾爱带佬学习">
+<meta property='og:url' content='https://zhu1ang.github.io/p/52study_4/'>
 <meta property='og:site_name' content='剑饮雪'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='学习笔记' /><meta property='article:tag' content='安卓逆向' /><meta property='article:published_time' content='2024-09-10T10:58:46&#43;08:00'/><meta property='article:modified_time' content='2024-09-10T10:58:46&#43;08:00'/>
-<meta name="twitter:title" content="安卓逆向学习笔记（一）">
-<meta name="twitter:description" content="Android相关基础简单学习">
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='安卓逆向' /><meta property='article:tag' content='学习笔记' /><meta property='article:published_time' content='2024-09-26T13:57:41&#43;08:00'/><meta property='article:modified_time' content='2024-09-26T13:57:41&#43;08:00'/>
+<meta name="twitter:title" content="安卓逆向入门（四）">
+<meta name="twitter:description" content="跟随吾爱带佬学习">
     <link rel="shortcut icon" href="/static/images/favicon.ico" />
 
   
@@ -253,12 +253,14 @@
   <ol>
     <li>
       <ol>
-        <li>
+        <li><a href="#动态调试">动态调试</a>
           <ol>
-            <li><a href="#系统架构">系统架构</a></li>
-            <li><a href="#android四大组件">Android四大组件</a></li>
+            <li><a href="#修改权限">修改权限</a></li>
+            <li><a href="#下断点">下断点</a></li>
+            <li><a href="#debug模式启动">debug模式启动</a></li>
           </ol>
         </li>
+        <li><a href="#log插桩">log插桩</a></li>
       </ol>
     </li>
   </ol>
@@ -288,12 +290,12 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/p/240910/">安卓逆向学习笔记（一）</a>
+            <a href="/p/52study_4/">安卓逆向入门（四）</a>
         </h2>
     
         
         <h3 class="article-subtitle">
-            Android相关基础简单学习
+            跟随吾爱带佬学习
         </h3>
         
     </div>
@@ -314,7 +316,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Sep 10, 2024</time>
+                <time class="article-time--published">Sep 26, 2024</time>
             </div>
         
 
@@ -344,36 +346,166 @@
     <section class="article-content">
     
     
-    <h4 id="系统架构">系统架构
-</h4><p>​	Android是一个基于Linux的操作系统。从底层开始，依次是Linux内核层、HAL硬件抽象层（不重要）、运行库、应用框架（App Framework）、应用程序。</p>
-<h5 id="linux内核层">Linux内核层
-</h5><p>​	Android使用的是Linux的内核，所以Android和Linux在底层本质是一样的，提供操作系统的核心功能。</p>
-<h5 id="系统运行库层">系统运行库层
-</h5><p>​	由两部分构成，一部分是C/C++编写的原生库文件，可以通过API被应用直接调用，例如：libopengl.so、libsqlite3.so。第二部分是安卓运行时库，是Android应用程序执行时的环境，在Android5.0之前使用Dalvik VM（libdvm.so）作为运行环境，之后是Art（libart.so）。</p>
-<h5 id="应用框架层">应用框架层
-</h5><p>​	提供API用于构建Android应用，可以看作是应用程序和运行库的一个接口。无论APP加壳与否，其框架层的代码在应用层加载之前就存在。</p>
-<h6 id="安卓加壳了解">安卓加壳了解
-</h6><p>​	加壳是指对Android应用的APK文件进行额外的包装，类似于在应用的外面加了一层壳，通过这一层壳可以隐藏或保护应用的实际内容。被加壳的APK文件在启动时会先执行壳中的代码，壳的代码负责解密或加载被保护的真实应用。</p>
-<p>​	加壳技术的迭代过程：</p>
-<ul>
-<li>代码混淆，将应用的类名、方法名、变量名等转换为毫无意义的字符，增加静态分析的难度</li>
-<li>动态dex，Dex文件是Android应用中包含字节码的核心文件。加壳时，开发者会将Dex文件进行加密，只有在运行时壳程序才会解密这些Dex文件，并将其加载到内存中执行。常见的加密方式包括AES、DES等对称加密算法。</li>
-<li>动态dex+函数抽取，得到dex反汇编查看仍然会有部分函数的内容是隐藏的。</li>
-<li>VMP保护，将部分应用逻辑放到一个自定义的虚拟机中执行，增强对应用核心逻辑的保护。
-<ul>
-<li>dex2c，将java代码进行词法句法分析，生成对应的C/C++文件，然后交叉编译成so动态库</li>
-</ul>
-</li>
-</ul>
-<h5 id="应用层">应用层
-</h5><p>​	即App层，包括系统应用和自己安装的普通应用。也就是日的对象。</p>
-<h4 id="android四大组件">Android四大组件
-</h4><p>​	<strong>Activity（活动）</strong>、<strong>Service（服务）</strong>、<strong>Broadcast Receiver（广播接收器）</strong> 和 <strong>Content Provider（内容提供者）</strong>。</p>
-<p>​	<strong>Activity</strong> 是 Android 应用中用于构建用户界面的组件。每个 Activity 都表示应用的一个可视化界面，负责与用户的交互。</p>
-<p>​	<strong>Service</strong> 是 Android 中的后台组件，用于执行长时间运行的操作，不需要与用户进行交互。Service 一般用于处理一些不需要用户界面但又需要长期存在的操作，如播放音乐、下载文件等。</p>
-<p>​	<strong>Broadcast Receiver</strong>用于响应 来自其他应用程序或者系统的广播消息。</p>
-<p>​	<strong>Content Provider</strong> 是 Android 用来实现应用间数据共享的组件，也是 Android 中处理数据共享的唯一标准方式。</p>
-
+    <h3 id="动态调试">动态调试
+</h3><h4 id="修改权限">修改权限
+</h4><p>方法一:在AndroidManifest.xml里添加可调试权限</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">android:debuggable=&#34;true&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>方法二：XappDebug模块hook对应的ap</p>
+<p>方法三：Magisk命令(重启失效)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">adb shell #adb进入命令行模式
+</span></span><span class="line"><span class="cl">su #切换至超级用户
+</span></span><span class="line"><span class="cl">magisk resetprop ro.debuggable 1
+</span></span><span class="line"><span class="cl">stop;start; #一定要通过该方式重启
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>方法四:刷入MagiskHide Props Config模块</p>
+<p>可以参考：<a class="link" href="https://wuxiaosu.github.io/posts/%E4%BD%BF%E7%94%A8magiskhide%E5%BC%80%E5%90%AF%E5%85%A8%E5%B1%80%E5%8F%AF%E8%B0%83%E8%AF%95/"  target="_blank" rel="noopener"
+    >MagiskHidePropsConf开启全局调试</a></p>
+<h4 id="下断点">下断点
+</h4><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410111522029.png?x-oss-process=style/zzz" alt="screenshot[1]" style="zoom:25%;" /><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410111527404.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241011152745312"
+	
+	
+></p>
+<p>根据提示，在jeb里进行字符串搜索，定位进行密钥判断的代码</p>
+<p>分析逻辑后，在check函数的返回值一行下断点</p>
+<h4 id="debug模式启动">debug模式启动
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">adb shell am start -D -n com.zj.wuaipojie/.ui.MainActivity
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>adb shell am start -D -n 包名/类名</p>
+<p>然后在jeb里面进行调试器attcah</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410111546965.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241011154614906"
+	
+	
+></p>
+<p>在教程demo里再次输入密钥，断下来之后可以直接next然后查看check函数的返回值，也就是密钥。</p>
+<img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410111655412.png?x-oss-process=style/zzz" alt="screenshot[1]" style="zoom:25%;" />
+<p>但是这里我在jeb里无法看到变量值，而且运行调试会卡死再断掉，故使用frida进行hook查看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="nx">Java</span><span class="p">.</span><span class="nx">perform</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取目标类
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">var</span> <span class="nx">Encode</span> <span class="o">=</span> <span class="nx">Java</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">&#39;com.zj.wuaipojie.Encode&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">Base64Utils</span> <span class="o">=</span> <span class="nx">Java</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">&#39;com.zj.wuaipojie.util.Base64Utils&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Hook Encode.encode 方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Encode</span><span class="p">.</span><span class="nx">encode</span><span class="p">.</span><span class="nx">implementation</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Encode.encode 被调用，输入: &#39;</span> <span class="o">+</span> <span class="nx">input</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// 调用原始方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Encode.encode 输出: &#39;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Hook Base64Utils.encodeToString 方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Base64Utils</span><span class="p">.</span><span class="nx">encodeToString</span><span class="p">.</span><span class="nx">overload</span><span class="p">(</span><span class="s1">&#39;[B&#39;</span><span class="p">).</span><span class="nx">implementation</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">bytes</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 打印 bytes 内容
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;bytes content:&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// 转换 bytes 为十六进制字符串
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kd">var</span> <span class="nx">hexString</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">bytes</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">hexString</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;0&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">bytes</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">).</span><span class="nx">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">)).</span><span class="nx">slice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">hexString</span><span class="p">.</span><span class="nx">trim</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// 调用原始方法获取 Base64 编码结果
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kd">var</span> <span class="nx">base64String</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">encodeToString</span><span class="p">(</span><span class="nx">bytes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// 打印 Base64 编码结果
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Base64 编码结果: &#39;</span> <span class="o">+</span> <span class="nx">base64String</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// 返回原始 Base64 编码结果
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">return</span> <span class="nx">base64String</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="log插桩">log插桩
+</h3><p>Log插桩指的是反编译APK文件时，在对应的smali文件里，添加相应的smali代码，将程序中的关键信息，以log日志的形式进行输出。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">invoke</span><span class="o">-</span><span class="k">static</span> <span class="p">{</span><span class="err">对应寄存器</span><span class="p">},</span> <span class="n">Lcom</span><span class="o">/</span><span class="n">mtools</span><span class="o">/</span><span class="n">LogUtils</span><span class="p">;</span><span class="o">-&gt;</span><span class="n">v</span><span class="p">(</span><span class="n">Ljava</span><span class="o">/</span><span class="n">lang</span><span class="o">/</span><span class="ne">Object</span><span class="p">;)</span><span class="n">V</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 </section>
 
 
@@ -381,9 +513,9 @@
     
     <section class="article-tags">
         
-            <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
-        
             <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">安卓逆向</a>
+        
+            <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
         
     </section>
 
@@ -431,19 +563,6 @@
             
                 
 <article class="">
-    <a href="/p/52study_4/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">安卓逆向入门（四）</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
     <a href="/p/52study_3/">
         
         
@@ -463,6 +582,19 @@
 
         <div class="article-details">
             <h2 class="article-title">安卓逆向入门（二）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（一）</h2>
         </div>
     </a>
 </article>

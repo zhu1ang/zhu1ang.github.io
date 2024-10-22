@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="跟随吾爱带佬学习">
+<title>安卓逆向入门（五）</title>
+
+<link rel='canonical' href='https://zhu1ang.github.io/p/52study_5/'>
+
+<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="安卓逆向入门（五）">
+<meta property='og:description' content="跟随吾爱带佬学习">
+<meta property='og:url' content='https://zhu1ang.github.io/p/52study_5/'>
+<meta property='og:site_name' content='剑饮雪'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='安卓逆向' /><meta property='article:tag' content='学习笔记' /><meta property='article:published_time' content='2024-10-14T14:42:45&#43;08:00'/><meta property='article:modified_time' content='2024-10-14T14:42:45&#43;08:00'/>
+<meta name="twitter:title" content="安卓逆向入门（五）">
+<meta name="twitter:description" content="跟随吾爱带佬学习">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Ukenn2112/UkennWeb@3.0/index/web.js"></script>
+        <div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ico_hu627d1395d31b147b1726fc8be242e34e_39784_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">剑饮雪</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/zhu1ang'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#apk签名校验">APK签名校验</a></li>
+            <li><a href="#签名校验对抗">签名校验对抗</a></li>
+            <li><a href="#手动实现pm代理">手动实现PM代理</a></li>
+            <li><a href="#io重定向">IO重定向</a></li>
+            <li><a href="#其他校验">其他校验</a></li>
+            <li><a href="#smali赋值">smali赋值</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" >
+                安卓逆向
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/52study_5/">安卓逆向入门（五）</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            跟随吾爱带佬学习
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 14, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h4 id="apk签名校验">APK签名校验
+</h4><p>通过对 Apk 进行签名，开发者可以证明对 Apk 的所有权和控制权，可用于安装和更新其应用。而在 Android 设备上的安装 Apk ，如果是一个没有被签名的 Apk，则会被拒绝安装。在安装 Apk 的时候，软件包管理器也会验证 Apk 是否已经被正确签名，并且通过签名证书和数据摘要验证是否合法没有被篡改。只有确认安全无篡改的情况下，才允许安装在设备上。</p>
+<p>简单来说，APK 的签名主要作用有两个：</p>
+<ol>
+<li>证明 APK 的所有者。</li>
+<li>允许 Android 市场和设备校验 APK 的正确性。</li>
+</ol>
+<p>Android 目前支持以下四种应用签名方案：
+v1 方案：基于 JAR 签名。
+v2 方案：APK 签名方案 v2（在 Android 7.0 中引入）
+v3 方案：APK 签名方案 v3（在 Android 9 中引入）
+v4 方案：APK 签名方案 v4（在 Android 11 中引入）</p>
+<p>V1 签名的机制主要就在 META-INF 目录下的三个文件，MANIFEST.MF，ANDROID.SF，ANDROID.RSA，他们都是 V1 签名的产物。
+（1）MANIFEST.MF：这是摘要文件。程序遍历Apk包中的所有文件(entry)，对非文件夹非签名文件的文件，逐个用SHA1(安全哈希算法)生成摘要信息，再用Base64进行编码。如果你改变了apk包中的文件，那么在apk安装校验时，改变后的文件摘要信息与MANIFEST.MF的检验信息不同，于是程序就不能成功安装。</p>
+<p>（2）ANDROID.SF：这是对摘要的签名文件。对前一步生成的MANIFEST.MF，使用SHA1-RSA算法，用开发者的私钥进行签名。在安装时只能使用公钥才能解密它。解密之后，将它与未加密的摘要信息（即，MANIFEST.MF文件）进行对比，如果相符，则表明内容没有被异常修改。</p>
+<p>（3）ANDROID.RSA文件中保存了公钥、所采用的加密算法等信息。</p>
+<h4 id="签名校验对抗">签名校验对抗
+</h4><p>方法一:核心破解插件，不签名安装应用
+方法二:一键过签名工具，例如MT、NP、ARMPro、CNFIX、Modex的去除签名校验功能
+方法三:具体分析签名校验逻辑(手撕签名校验)
+方法四:io重定向&ndash;VA&amp;SVC：ptrace+seccomp</p>
+<h4 id="手动实现pm代理">手动实现PM代理
+</h4><p><a class="link" href="https://github.com/fourbrother/HookPmsSignature"  target="_blank" rel="noopener"
+    >HOOK PMS</a></p>
+<p>有一些过时，源码可以看一下，使用也可以了解了解</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">com.zj.hookpms</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.Field</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.Method</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.lang.reflect.Proxy</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">android.content.Context</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">android.content.pm.PackageManager</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">android.util.Log</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ServiceManagerWraper</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">ZJ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;ZJ595&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">hookPMS</span><span class="p">(</span><span class="n">Context</span><span class="w"> </span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">signed</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">appPkgName</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">hashCode</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 获取全局的ActivityThread对象</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">activityThreadClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&#34;android.app.ActivityThread&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Method</span><span class="w"> </span><span class="n">currentActivityThreadMethod</span><span class="w"> </span><span class="o">=</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">activityThreadClass</span><span class="p">.</span><span class="na">getDeclaredMethod</span><span class="p">(</span><span class="s">&#34;currentActivityThread&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Object</span><span class="w"> </span><span class="n">currentActivityThread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentActivityThreadMethod</span><span class="p">.</span><span class="na">invoke</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 获取ActivityThread里面原始的sPackageManager</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Field</span><span class="w"> </span><span class="n">sPackageManagerField</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">activityThreadClass</span><span class="p">.</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">&#34;sPackageManager&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">sPackageManagerField</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Object</span><span class="w"> </span><span class="n">sPackageManager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sPackageManagerField</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">currentActivityThread</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 准备好代{过}{滤}理对象, 用来替换原始的对象</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">iPackageManagerInterface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&#34;android.content.pm.IPackageManager&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Object</span><span class="w"> </span><span class="n">proxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Proxy</span><span class="p">.</span><span class="na">newProxyInstance</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">iPackageManagerInterface</span><span class="p">.</span><span class="na">getClassLoader</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="k">new</span><span class="w"> </span><span class="n">Class</span><span class="o">&lt;?&gt;[]</span><span class="p">{</span><span class="n">iPackageManagerInterface</span><span class="p">},</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="k">new</span><span class="w"> </span><span class="n">PmsHookBinderInvocationHandler</span><span class="p">(</span><span class="n">sPackageManager</span><span class="p">,</span><span class="w"> </span><span class="n">signed</span><span class="p">,</span><span class="w"> </span><span class="n">appPkgName</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 1. 替换掉ActivityThread里面的 sPackageManager 字段</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">sPackageManagerField</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">currentActivityThread</span><span class="p">,</span><span class="w"> </span><span class="n">proxy</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 2. 替换 ApplicationPackageManager里面的 mPM对象</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">PackageManager</span><span class="w"> </span><span class="n">pm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">context</span><span class="p">.</span><span class="na">getPackageManager</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Field</span><span class="w"> </span><span class="n">mPmField</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="na">getClass</span><span class="p">().</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">&#34;mPM&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">mPmField</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">mPmField</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">pm</span><span class="p">,</span><span class="w"> </span><span class="n">proxy</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">ZJ</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;hook pms error:&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Log</span><span class="p">.</span><span class="na">getStackTraceString</span><span class="p">(</span><span class="n">e</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">hookPMS</span><span class="p">(</span><span class="n">Context</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">Sign</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;原包的签名信息&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">hookPMS</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="n">Sign</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;com.zj.hookpms&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="io重定向">IO重定向
+</h4><p>IO重定向可以干嘛？</p>
+<p>1，可以让文件只读，不可写</p>
+<p>2，禁止访问文件</p>
+<p>3，路径替换</p>
+<p>具体实现：
+过签名检测(读取原包)
+风控对抗(例:一个文件记录App启动的次数)
+过Root检测，Xposed检测(文件不可取)</p>
+<h5 id="普通签名校验">普通签名校验
+</h5><p>在jadx里定位到校验的代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">checkSign</span><span class="p">(</span><span class="n">Context</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Signature</span><span class="w"> </span><span class="n">signature</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">context</span><span class="p">.</span><span class="na">getPackageManager</span><span class="p">().</span><span class="na">getPackageInfo</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="na">getPackageName</span><span class="p">(),</span><span class="w"> </span><span class="n">64</span><span class="p">).</span><span class="na">signatures</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">MessageDigest</span><span class="w"> </span><span class="n">messageDigest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MessageDigest</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&#34;SHA&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">messageDigest</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">signature</span><span class="p">.</span><span class="na">toByteArray</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">String</span><span class="w"> </span><span class="n">encodeToString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Base64Utils</span><span class="p">.</span><span class="na">INSTANCE</span><span class="p">.</span><span class="na">encodeToString</span><span class="p">(</span><span class="n">messageDigest</span><span class="p">.</span><span class="na">digest</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="s">&#34;zj2595&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;sign:&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">encodeToString</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Intrinsics</span><span class="p">.</span><span class="na">areEqual</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">SIGNATURE</span><span class="p">,</span><span class="w"> </span><span class="n">encodeToString</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">SIGNATURE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;h99Ici0iopj8tC6NkfqyJgs73ss=&#34;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410141550721.png?x-oss-process=style/zzz" alt="screenshot[1]" style="zoom:25%;" /><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410141556104.png?x-oss-process=style/zzz" alt="screenshot1[1]" style="zoom:25%;" /></p>
+<p>使用MT管理器在classdex文件中定位到相关校验的位置，使用算法助手输出日志，在日志中可以查看到修改之后的签名校验，进行替换。新的API签名校验也可这样绕过。</p>
+<h5 id="crc校验">CRC校验
+</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    sget-object p10, Lcom/zj/wuaipojie/util/ContextUtils;-&gt;INSTANCE:Lcom/zj/wuaipojie/util/ContextUtils;  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    invoke-virtual {p10}, Lcom/zj/wuaipojie/util/ContextUtils;-&gt;getContext()Landroid/content/Context;  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    move-result-object p10  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    invoke-static {p10}, Lcom/zj/wuaipojie/util/SecurityUtil;-&gt;hook(Landroid/content/Context;)V
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>调用教程作者已经写好的方法（在checkcrc方法被调用之前进行调用），使得进行crc校验以及hash校验的时候重定向到未修改的包。</p>
+<p>hook open、openat等读取文件的底层函数</p>
+<h4 id="其他校验">其他校验
+</h4><p>root检测</p>
+<p>反制手段
+1.算法助手、对话框取消等插件一键hook
+2.分析具体的检测代码
+3.利用IO重定向使文件不可读
+4.修改Andoird源码，去除常见指纹</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">fun</span> <span class="nf">isDeviceRooted</span><span class="p">():</span> <span class="n">Boolean</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">checkRootMethod1</span><span class="p">()</span> <span class="o">||</span> <span class="n">checkRootMethod2</span><span class="p">()</span> <span class="o">||</span> <span class="n">checkRootMethod3</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">fun</span> <span class="nf">checkRootMethod1</span><span class="p">():</span> <span class="n">Boolean</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">val</span> <span class="py">buildTags</span> <span class="p">=</span> <span class="n">android</span><span class="p">.</span><span class="n">os</span><span class="p">.</span><span class="nc">Build</span><span class="p">.</span><span class="n">TAGS</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">buildTags</span> <span class="o">!=</span> <span class="k">null</span> <span class="o">&amp;&amp;</span> <span class="n">buildTags</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&#34;test-keys&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">fun</span> <span class="nf">checkRootMethod2</span><span class="p">():</span> <span class="n">Boolean</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">val</span> <span class="py">paths</span> <span class="p">=</span> <span class="n">arrayOf</span><span class="p">(</span><span class="s2">&#34;/system/app/Superuser.apk&#34;</span><span class="p">,</span> <span class="s2">&#34;/sbin/su&#34;</span><span class="p">,</span> <span class="s2">&#34;/system/bin/su&#34;</span><span class="p">,</span> <span class="s2">&#34;/system/xbin/su&#34;</span><span class="p">,</span> <span class="s2">&#34;/data/local/xbin/su&#34;</span><span class="p">,</span> <span class="s2">&#34;/data/local/bin/su&#34;</span><span class="p">,</span> <span class="s2">&#34;/system/sd/xbin/su&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;/system/bin/failsafe/su&#34;</span><span class="p">,</span> <span class="s2">&#34;/data/local/su&#34;</span><span class="p">,</span> <span class="s2">&#34;/su/bin/su&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="n">path</span> <span class="k">in</span> <span class="n">paths</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">File</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="n">exists</span><span class="p">())</span> <span class="k">return</span> <span class="k">true</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">false</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">fun</span> <span class="nf">checkRootMethod3</span><span class="p">():</span> <span class="n">Boolean</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">var</span> <span class="py">process</span><span class="p">:</span> <span class="n">Process</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">process</span> <span class="p">=</span> <span class="nc">Runtime</span><span class="p">.</span><span class="n">getRuntime</span><span class="p">().</span><span class="n">exec</span><span class="p">(</span><span class="n">arrayOf</span><span class="p">(</span><span class="s2">&#34;/system/xbin/which&#34;</span><span class="p">,</span> <span class="s2">&#34;su&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="k">val</span> <span class="py">bufferedReader</span> <span class="p">=</span> <span class="n">BufferedReader</span><span class="p">(</span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">process</span><span class="p">.</span><span class="n">inputStream</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bufferedReader</span><span class="p">.</span><span class="n">readLine</span><span class="p">()</span> <span class="o">!=</span> <span class="k">null</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">Throwable</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">process</span><span class="o">?.</span><span class="n">destroy</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>模拟器检测</p>
+<p>通过检测系统的 <code>Build</code> 对象来判断当前设备是否为模拟器。具体方法是检测 <code>Build.FINGERPRINT</code> 属性是否包含字符串 <code>&quot;generic&quot;</code>。</p>
+<p>反调试检测</p>
+<p><a class="link" href="https://bbs.pediy.com/thread-268155.htm"  target="_blank" rel="noopener"
+    >链接</a></p>
+<h4 id="smali赋值">smali赋值
+</h4><p>int型</p>
+<p>const/4 最大只允许存放4个二进制位(4bit)，
+const/16 最大值允许存放16个二进制位(16bit)， 第一位(即最高位)默认为符号位。</p>
+<p>long型</p>
+<p><strong>onst-wide vx, lit32</strong> 表示将一个 32 位的常量存储到 vx 与 vx+1 两个寄存器中 —— 即一个 long 类型的数据</p>
+<p>变量赋值</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">安卓逆向</a>
+        
+            <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/52study_6/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（六）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_4/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（四）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_3/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（三）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_2/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（二）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（一）</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    
+    
+    <section class="totalcount">
+    
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+    发表了13篇文章 · 
+    总计2.60k字
+    </section>
+
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<a href="#" id="back-to-top" title="返回顶部"></a>
+
+
+<style>
+  #back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 55px;
+    width: 55px;
+    height: 55px;
+    border-radius: 7px;
+    background-color: rgba(64, 158, 255, 0.5);
+    box-shadow: var(--shadow-l2);
+    font-size: 30px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+  }
+
+  #back-to-top:before {
+    content: ' ';
+    display: inline-block;
+    position: relative;
+    top: 0;
+    transform: rotate(135deg);
+    height: 10px;
+    width: 10px;
+    border-width: 0 0 2px 2px;
+    border-color: var(--back-to-top-color);
+    border-style: solid;
+  }
+
+  #back-to-top:hover:before {
+    border-color: #2674e0;
+  }
+
+   
+  @media screen and (max-width: 768px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 10px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1024px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 40px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1280px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 55px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1536px) {
+    #back-to-top {
+      visibility: hidden;
+    }
+  }
+</style>
+
+
+<script>
+  function backToTop() {
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+    })
+  }
+
+  window.onload = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop > 0) {
+      totopBtn.style.display = 'inline'
+    } else {
+      totopBtn.style.display = 'none'
+    }
+  }
+
+  window.onscroll = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop < 200) {
+      totopBtn.style.display = 'none'
+    } else {
+      totopBtn.style.display = 'inline'
+      totopBtn.addEventListener('click', backToTop, false)
+    }
+  }
+</script>
+
+    </body>
+</html>
