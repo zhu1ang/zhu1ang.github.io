@@ -7,7 +7,54 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>zhu1ang</copyright>
-        <lastBuildDate>Thu, 17 Oct 2024 15:31:16 +0800</lastBuildDate><atom:link href="https://zhu1ang.github.io/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 24 Oct 2024 10:14:13 +0800</lastBuildDate><atom:link href="https://zhu1ang.github.io/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>安卓逆向入门（七）</title>
+        <link>https://zhu1ang.github.io/p/52study_7/</link>
+        <pubDate>Thu, 24 Oct 2024 10:14:13 +0800</pubDate>
+        
+        <guid>https://zhu1ang.github.io/p/52study_7/</guid>
+        <description>&lt;h4 id=&#34;密码学基础&#34;&gt;密码学基础
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;明文：原始消息&lt;/li&gt;
+&lt;li&gt;密文：加密后的消息&lt;/li&gt;
+&lt;li&gt;加密：从明文到密文的变换过程&lt;/li&gt;
+&lt;li&gt;解密：从密文到明文的变换过程&lt;/li&gt;
+&lt;li&gt;密钥：相用来完成加解密等过程的秘密信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;对称加密&#34;&gt;对称加密
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;AES&lt;/strong&gt;加密和解密使用的是相同的密钥&lt;/p&gt;
+&lt;h5 id=&#34;非对称加密&#34;&gt;非对称加密
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;RSA&lt;/strong&gt;发送方使用公钥进行加密，接收方使用私钥进行解密（每次加密得到的密文不同）&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;DH密钥交换&lt;/strong&gt;双方协商相同的算法参数，使用各自的私钥加密后生成公钥进行交换，再把交换后的使用自己的私钥处理得到相同的密钥。&lt;/p&gt;
+&lt;h5 id=&#34;hash&#34;&gt;Hash
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;哈希算法&lt;/strong&gt;是一种将&lt;strong&gt;任意长度的输入&lt;/strong&gt;（如文本、文件等）通过&lt;strong&gt;算法转换为固定长度的输出&lt;/strong&gt;（称为哈希值或摘要）的函数。这个过程是不可逆的，即无法通过哈希值还原出原始数据。常见的哈希算法包括 &lt;strong&gt;MD5、SHA-1、SHA-256&lt;/strong&gt; 等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特点&lt;/strong&gt;：高敏感性（一个字符的变化都会导致hash值巨大变化）、抗碰撞性（不同的输入尽量不会产生相同的hash值）&lt;/p&gt;
+&lt;h5 id=&#34;消息认证码mac&#34;&gt;消息认证码（MAC）
+&lt;/h5&gt;&lt;p&gt;在单向散列函数的基础上，增添共享密钥进行认证，但是这个密钥会存在分发问题。&lt;/p&gt;
+&lt;h5 id=&#34;数字证书ca&#34;&gt;数字证书CA
+&lt;/h5&gt;&lt;p&gt;为了确认公钥持有者的身份，让一个&lt;strong&gt;可信的第三方&lt;/strong&gt;来对公钥进行签名，这个可信的第三方，称之为&lt;strong&gt;Certificate authorities（CA）&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;参考以及拓展阅读：&lt;a class=&#34;link&#34; href=&#34;https://catbro666.github.io/posts/e92ef4b4/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;TLS协议&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;常见编码&#34;&gt;常见编码
+&lt;/h4&gt;&lt;h5 id=&#34;base64编码&#34;&gt;Base64编码
+&lt;/h5&gt;&lt;p&gt;Base64是一种用64个字符表示任意二进制数据的方法，是一种编码，并非加密字符编码，由 A-Z a-z 0-9 + / 和补充字符 “=” 组成，Base64编码后的字符数是4的倍数（不足会补&amp;quot;=&amp;quot;）&lt;/p&gt;
+&lt;h5 id=&#34;hex编码&#34;&gt;Hex编码
+&lt;/h5&gt;&lt;p&gt;hex编码，又称十六进制编码(也称base16)，一般用于方便人们查看二进制文件内容，它将字节数据中的每4个bit使用数字(0-9)、字母(A-F)共16个字符等效表示，由于一个字节有8个bit，所以一个字节会被编码为2个hex字符
+PS:在 ASCII 编码中，只有0到127之间的数字是表示英文字母、数字和符号的，超出这个范围的字符需要使用其他编码方式,例如汉字就需要使用 UTF-8 或 UTF-16&lt;/p&gt;
+&lt;h5 id=&#34;unicode编码&#34;&gt;Unicode编码
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;Unicode&lt;/strong&gt; 是一种字符编码标准，旨在为世界上所有的&lt;strong&gt;文字、符号和表情符号&lt;/strong&gt;分配唯一的编码，以解决不同语言和字符集之间的不兼容问题。Unicode 编码目前广泛用于互联网、操作系统、编程语言和数据库系统。&lt;/p&gt;
+&lt;h4 id=&#34;非标准加密对抗&#34;&gt;非标准加密对抗
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;主动调用&lt;/li&gt;
+&lt;li&gt;补全代码还原算法（Chatgpt发力区间）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;课后作业&#34;&gt;课后作业
+&lt;/h4&gt;&lt;p&gt;修改教程demo中的值&lt;/p&gt;
+&lt;p&gt;思路：jadx定位，xposed模块编写hook去修改&lt;/p&gt;
+&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410241403157.png?x-oss-process=style/zzz&#34; alt=&#34;Screenshot_20241024-020222[1]&#34; style=&#34;zoom:25%;&#34; /&gt;
+</description>
+        </item>
+        <item>
         <title>安卓逆向入门（六）</title>
         <link>https://zhu1ang.github.io/p/52study_6/</link>
         <pubDate>Thu, 17 Oct 2024 15:31:16 +0800</pubDate>
