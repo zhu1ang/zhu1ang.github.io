@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="so加载流程\r反调试、脱壳、注入等 涉及到的函数介绍： 函数名 描述 android_dlopen_ext() 、dlopen()、do_dlopen() 这三个函数主要用于加载库文件。android_dlopen_ext 是系统的一个函数，用于在运行时动态加载共享库。与标准的 dlopen() 函数相比，android_dlopen_ext 提供了更多的参数选项和扩展功能，例如支持命名空间、符号版本等特性。 find_library() find_library() 函数用于查找库，基本的用途是给定一个库的名字，然后查找并返回这个库的路径。 call_constructors() call_constructors() 是用于调用动态加载库中的构造函数的函数。 init 库的构造函数，用于初始化库中的静态变量或执行其他需要在库被加载时完成的任务。如果没有定义init函数，系统将不会执行任何动作。需要注意的是，init函数不应该有任何参数，并且也没有返回值。 init_array init_array是ELF（Executable and Linkable Format，可执行和可链接格式）二进制格式中的一个特殊段（section），这个段包含了一些函数的指针，这些函数将在main()函数执行前被调用，用于初始化静态局部变量和全局变量。 jni_onload 这是Android JNI(Java Native Interface)中的一个函数。当一个native库被系统加载时，该函数会被自动调用。JNI_OnLoad可以做一些初始化工作，例如注册你的native方法或者初始化一些数据结构。如果你的native库没有定义这个函数，那么JNI会使用默认的行为。JNI_OnLoad的返回值应该是需要的JNI版本，一般返回JNI_VERSION_1_6。 下断点时机： 应用级别的：java_com_XXX； 外壳级别的：JNI_Onload，.init，.init_array(反调试); 系统级别的：fopen，fget，dvmdexfileopen(脱壳)； IDA动态调试\r1.前置操作： 1.在IDA目录下的dbgsrv，选择跟手机架构一致的server 2.adb push as /data/local/tmp/ 3.进入手机端命令：adb shell 4.切换获取手机的root权限：su 5.跳到对应路径：cd /data/local/tmp/ 6.提权：chmod 777 as 7.XappDebug hook 2.调试步骤 分为两种模式，一种是以debug模式启动，第二种则以普通模式启动，二者的区别在于使用场景，有时候要动态调试的参数在app一启动的时候就产生了，时机较早，所以需要以debug模式去挂起app 1 2 3 4 adb shell am start -D -n com.zj.wuaipojie/.ui.ChallengeEight （去掉-D 则表示不以debug模式启动app） adb forward tcp:23946 tcp:23946 (端口转发) adb forward tcp:8700 jdwp:PID (pid监听) jdb -connect com.">
+<title>安卓逆向入门（八）</title>
+
+<link rel='canonical' href='https://zhu1ang.github.io/p/52study_8/'>
+
+<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="安卓逆向入门（八）">
+<meta property='og:description' content="so加载流程\r反调试、脱壳、注入等 涉及到的函数介绍： 函数名 描述 android_dlopen_ext() 、dlopen()、do_dlopen() 这三个函数主要用于加载库文件。android_dlopen_ext 是系统的一个函数，用于在运行时动态加载共享库。与标准的 dlopen() 函数相比，android_dlopen_ext 提供了更多的参数选项和扩展功能，例如支持命名空间、符号版本等特性。 find_library() find_library() 函数用于查找库，基本的用途是给定一个库的名字，然后查找并返回这个库的路径。 call_constructors() call_constructors() 是用于调用动态加载库中的构造函数的函数。 init 库的构造函数，用于初始化库中的静态变量或执行其他需要在库被加载时完成的任务。如果没有定义init函数，系统将不会执行任何动作。需要注意的是，init函数不应该有任何参数，并且也没有返回值。 init_array init_array是ELF（Executable and Linkable Format，可执行和可链接格式）二进制格式中的一个特殊段（section），这个段包含了一些函数的指针，这些函数将在main()函数执行前被调用，用于初始化静态局部变量和全局变量。 jni_onload 这是Android JNI(Java Native Interface)中的一个函数。当一个native库被系统加载时，该函数会被自动调用。JNI_OnLoad可以做一些初始化工作，例如注册你的native方法或者初始化一些数据结构。如果你的native库没有定义这个函数，那么JNI会使用默认的行为。JNI_OnLoad的返回值应该是需要的JNI版本，一般返回JNI_VERSION_1_6。 下断点时机： 应用级别的：java_com_XXX； 外壳级别的：JNI_Onload，.init，.init_array(反调试); 系统级别的：fopen，fget，dvmdexfileopen(脱壳)； IDA动态调试\r1.前置操作： 1.在IDA目录下的dbgsrv，选择跟手机架构一致的server 2.adb push as /data/local/tmp/ 3.进入手机端命令：adb shell 4.切换获取手机的root权限：su 5.跳到对应路径：cd /data/local/tmp/ 6.提权：chmod 777 as 7.XappDebug hook 2.调试步骤 分为两种模式，一种是以debug模式启动，第二种则以普通模式启动，二者的区别在于使用场景，有时候要动态调试的参数在app一启动的时候就产生了，时机较早，所以需要以debug模式去挂起app 1 2 3 4 adb shell am start -D -n com.zj.wuaipojie/.ui.ChallengeEight （去掉-D 则表示不以debug模式启动app） adb forward tcp:23946 tcp:23946 (端口转发) adb forward tcp:8700 jdwp:PID (pid监听) jdb -connect com.">
+<meta property='og:url' content='https://zhu1ang.github.io/p/52study_8/'>
+<meta property='og:site_name' content='剑饮雪'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='安卓逆向' /><meta property='article:tag' content='学习笔记' /><meta property='article:published_time' content='2024-10-29T13:50:05&#43;08:00'/><meta property='article:modified_time' content='2024-10-29T13:50:05&#43;08:00'/>
+<meta name="twitter:title" content="安卓逆向入门（八）">
+<meta name="twitter:description" content="so加载流程\r反调试、脱壳、注入等 涉及到的函数介绍： 函数名 描述 android_dlopen_ext() 、dlopen()、do_dlopen() 这三个函数主要用于加载库文件。android_dlopen_ext 是系统的一个函数，用于在运行时动态加载共享库。与标准的 dlopen() 函数相比，android_dlopen_ext 提供了更多的参数选项和扩展功能，例如支持命名空间、符号版本等特性。 find_library() find_library() 函数用于查找库，基本的用途是给定一个库的名字，然后查找并返回这个库的路径。 call_constructors() call_constructors() 是用于调用动态加载库中的构造函数的函数。 init 库的构造函数，用于初始化库中的静态变量或执行其他需要在库被加载时完成的任务。如果没有定义init函数，系统将不会执行任何动作。需要注意的是，init函数不应该有任何参数，并且也没有返回值。 init_array init_array是ELF（Executable and Linkable Format，可执行和可链接格式）二进制格式中的一个特殊段（section），这个段包含了一些函数的指针，这些函数将在main()函数执行前被调用，用于初始化静态局部变量和全局变量。 jni_onload 这是Android JNI(Java Native Interface)中的一个函数。当一个native库被系统加载时，该函数会被自动调用。JNI_OnLoad可以做一些初始化工作，例如注册你的native方法或者初始化一些数据结构。如果你的native库没有定义这个函数，那么JNI会使用默认的行为。JNI_OnLoad的返回值应该是需要的JNI版本，一般返回JNI_VERSION_1_6。 下断点时机： 应用级别的：java_com_XXX； 外壳级别的：JNI_Onload，.init，.init_array(反调试); 系统级别的：fopen，fget，dvmdexfileopen(脱壳)； IDA动态调试\r1.前置操作： 1.在IDA目录下的dbgsrv，选择跟手机架构一致的server 2.adb push as /data/local/tmp/ 3.进入手机端命令：adb shell 4.切换获取手机的root权限：su 5.跳到对应路径：cd /data/local/tmp/ 6.提权：chmod 777 as 7.XappDebug hook 2.调试步骤 分为两种模式，一种是以debug模式启动，第二种则以普通模式启动，二者的区别在于使用场景，有时候要动态调试的参数在app一启动的时候就产生了，时机较早，所以需要以debug模式去挂起app 1 2 3 4 adb shell am start -D -n com.zj.wuaipojie/.ui.ChallengeEight （去掉-D 则表示不以debug模式启动app） adb forward tcp:23946 tcp:23946 (端口转发) adb forward tcp:8700 jdwp:PID (pid监听) jdb -connect com.">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Ukenn2112/UkennWeb@3.0/index/web.js"></script>
+        <div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ico_hu627d1395d31b147b1726fc8be242e34e_39784_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">剑饮雪</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/zhu1ang'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#so加载流程">so加载流程</a></li>
+            <li><a href="#ida动态调试">IDA动态调试</a></li>
+            <li><a href="#so防护手段之ollvm">so防护手段之ollvm</a></li>
+            <li><a href="#原帖">原帖</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" >
+                安卓逆向
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/52study_8/">安卓逆向入门（八）</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 29, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h4 id="so加载流程">so加载流程
+</h4><p>反调试、脱壳、注入等</p>
+<p><img src="https://pic.rmb.bdstatic.com/bjh/bb663034587188a1fa4ebf55789f66542707.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="img"
+	
+	
+></p>
+<p>涉及到的函数介绍：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:left">函数名</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>android_dlopen_ext()</code> 、<code>dlopen()</code>、<code>do_dlopen()</code></td>
+<td style="text-align:left">这三个函数主要用于加载库文件。<code>android_dlopen_ext</code> 是系统的一个函数，用于在运行时动态加载共享库。与标准的 <code>dlopen()</code> 函数相比，<code>android_dlopen_ext</code> 提供了更多的参数选项和扩展功能，例如支持命名空间、符号版本等特性。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>find_library()</code></td>
+<td style="text-align:left"><code>find_library()</code> 函数用于查找库，基本的用途是给定一个库的名字，然后查找并返回这个库的路径。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>call_constructors()</code></td>
+<td style="text-align:left"><code>call_constructors()</code> 是用于调用动态加载库中的构造函数的函数。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>init</code></td>
+<td style="text-align:left">库的构造函数，用于初始化库中的静态变量或执行其他需要在库被加载时完成的任务。如果没有定义<code>init</code>函数，系统将不会执行任何动作。需要注意的是，<code>init</code>函数不应该有任何参数，并且也没有返回值。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>init_array</code></td>
+<td style="text-align:left"><code>init_array</code>是ELF（Executable and Linkable Format，可执行和可链接格式）二进制格式中的一个特殊段（section），这个段包含了一些函数的指针，这些函数将在<code>main()</code>函数执行前被调用，用于初始化静态局部变量和全局变量。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>jni_onload</code></td>
+<td style="text-align:left">这是Android JNI(Java Native Interface)中的一个函数。当一个native库被系统加载时，该函数会被自动调用。<code>JNI_OnLoad</code>可以做一些初始化工作，例如注册你的native方法或者初始化一些数据结构。如果你的native库没有定义这个函数，那么JNI会使用默认的行为。<code>JNI_OnLoad</code>的返回值应该是需要的JNI版本，一般返回<code>JNI_VERSION_1_6</code>。</td>
+</tr>
+</tbody>
+</table></div>
+<p>下断点时机：
+应用级别的：java_com_XXX；
+外壳级别的：JNI_Onload，.init，.init_array(反调试);
+系统级别的：fopen，fget，dvmdexfileopen(脱壳)；</p>
+<h4 id="ida动态调试">IDA动态调试
+</h4><p>1.前置操作：</p>
+<p>1.在IDA目录下的dbgsrv，选择跟手机架构一致的server
+2.adb push as /data/local/tmp/
+3.进入手机端命令：adb shell
+4.切换获取手机的root权限：su
+5.跳到对应路径：cd /data/local/tmp/
+6.提权：chmod 777 as
+7.XappDebug hook</p>
+<p>2.调试步骤</p>
+<p>分为两种模式，一种是以debug模式启动，第二种则以普通模式启动，二者的区别在于使用场景，有时候要动态调试的参数在app一启动的时候就产生了，时机较早，所以需要以debug模式去挂起app</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bat" data-lang="bat"><span class="line"><span class="cl">adb shell am start -D -n com.zj.wuaipojie/.ui.ChallengeEight （去掉-D 则表示不以debug模式启动app）
+</span></span><span class="line"><span class="cl">adb forward tcp:23946 tcp:23946 (端口转发)
+</span></span><span class="line"><span class="cl">adb forward tcp:8700 jdwp:PID (pid监听)
+</span></span><span class="line"><span class="cl">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700 (jdb挂起)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>3.实例操作</p>
+<img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410311054768.png?x-oss-process=style/zzz" alt="Screenshot_20241029-031151[1]" style="zoom:25%;" />
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410291513268.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241029151346172"
+	
+	
+></p>
+<p>根据错误提示定位到check函数，把加载的so文件拉出来，使用IDA查看</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410291521452.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241029152152416"
+	
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">jint</span> <span class="nf">JNI_OnLoad</span><span class="p">(</span><span class="n">JavaVM</span> <span class="o">*</span><span class="n">vm</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">reserved</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">__int64</span> <span class="n">v4</span><span class="p">;</span> <span class="c1">// x0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">_QWORD</span> <span class="n">v5</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span> <span class="c1">// [xsp+0h] [xbp-30h] BYREF
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="n">v5</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)(</span><span class="nf">_ReadStatusReg</span><span class="p">(</span><span class="nf">ARM64_SYSREG</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="mi">40</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="nf">ptrace</span><span class="p">(</span><span class="n">PTRACE_TRACEME</span><span class="p">,</span> <span class="mi">0LL</span><span class="p">,</span> <span class="mi">1LL</span><span class="p">,</span> <span class="mi">0LL</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">__android_log_print</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s">&#34;NativeHookIO&#34;</span><span class="p">,</span> <span class="s">&#34;i am JNI_OnLoad&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">v5</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0LL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="o">*</span><span class="n">vm</span><span class="p">)</span><span class="o">-&gt;</span><span class="nf">GetEnv</span><span class="p">(</span><span class="n">vm</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">**</span><span class="p">)</span><span class="n">v5</span><span class="p">,</span> <span class="mi">65542LL</span><span class="p">)</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">v4</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="kr">__int64</span> <span class="p">(</span><span class="kr">__fastcall</span> <span class="o">**</span><span class="p">)(</span><span class="n">_QWORD</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">))(</span><span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)</span><span class="n">v5</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">48LL</span><span class="p">))(</span>
+</span></span><span class="line"><span class="cl">         <span class="n">v5</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">         <span class="s">&#34;com/zj/wuaipojie/util/SecurityUtil&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">v4</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="p">(</span><span class="kr">__fastcall</span> <span class="o">**</span><span class="p">)(</span><span class="n">_QWORD</span><span class="p">,</span> <span class="kr">__int64</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="p">,</span> <span class="kr">__int64</span><span class="p">))(</span><span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)</span><span class="n">v5</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1720LL</span><span class="p">))(</span><span class="n">v5</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v4</span><span class="p">,</span> <span class="n">methods</span><span class="p">,</span> <span class="mi">1LL</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">65542</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>JNI_OnLoad方法里面可能会有反调试的函数，将强制跳转到校验处patch为NOP，忽略校验。</p>
+<p>然后使用更新后的so文件替换掉apk中原来的so，开始调试</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410311044284.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241031104443155"
+	
+	
+></p>
+<p>注：使用IDA 9 Pro 的android_server64的话会一直报错</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410311050746.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241031105051702"
+	
+	
+></p>
+<p>运行到断点的时候，再单步运行到比较这里，就可以得到正确密码</p>
+<img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410311054317.png?x-oss-process=style/zzz" alt="Screenshot_20241030-225224[1]" style="zoom:25%;" />
+<h4 id="so防护手段之ollvm">so防护手段之ollvm
+</h4><p>常见防护手段:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:left">主要功能</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">SO加壳</td>
+<td style="text-align:left">对C/C++源码编译出来的SO文件进行加壳，使SO文件无法正确反编译和反汇编。</td>
+</tr>
+<tr>
+<td style="text-align:left">SO源码虚拟化保护</td>
+<td style="text-align:left">将原始汇编指令翻译为自定义的虚拟机指令，跳转到自定义的虚拟机中执行，每次保护生成的虚拟机指令随机，且对虚拟机解释器再度混淆</td>
+</tr>
+<tr>
+<td style="text-align:left">SO防调用</td>
+<td style="text-align:left">对SO文件进行授权绑定，防止SO文件被非授权应用调用运行。</td>
+</tr>
+<tr>
+<td style="text-align:left">SO Linker</td>
+<td style="text-align:left">对整个SO文件进行加密压缩，包括代码段、符号表和字符串等，运行时再解密解压缩到内存，从而有效的防止SO数据的泄露。</td>
+</tr>
+<tr>
+<td style="text-align:left">SO源码混淆</td>
+<td style="text-align:left">常量字符串加密、分裂基本块、等价指令替换、虚假控制流、控制流平坦化。</td>
+</tr>
+<tr>
+<td style="text-align:left">SO环境监测</td>
+<td style="text-align:left">防frida\xposed\root、防动态调试、防模拟器、防多开等</td>
+</tr>
+</tbody>
+</table></div>
+<p>ollvm的分类：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:left">分类</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">指令替换（Instructions Substitution)(Sub)</td>
+<td style="text-align:left">将一条运算指令替换为多条等价的运算指令，例如：y=x+1变为y=x+1+1-1</td>
+</tr>
+<tr>
+<td style="text-align:left">虚假控制流（Bogus Control Flow)(bcf)</td>
+<td style="text-align:left">通过加入包含不透明谓词的条件跳转和不可达的基本块，来干扰IDA的控制流分析和F5反汇编</td>
+</tr>
+<tr>
+<td style="text-align:left">控制流平坦化(Control Flow Flattening)(Fla)</td>
+<td style="text-align:left">主要通过一个主分发器来控制程序基本块的执行流程，将所有基本代码放到控制流最底部，然后删除原理基本块之间跳转关系，添加次分发器来控制分发逻辑，然后过新的复杂分发逻辑还原原来程序块之间的逻辑关系</td>
+</tr>
+<tr>
+<td style="text-align:left">字符串加密</td>
+<td style="text-align:left">编写一个pass将其中的字符串信息使用一些加密算法进行加密，然后特定的时间进行还原</td>
+</tr>
+</tbody>
+</table></div>
+<p>ollvm的对抗：</p>
+<p>1.简单ollvm可以通过交叉引用分析
+2.angr去除不透明谓词
+3.Unicorn/Unidbg/AndroidNativeEmu模拟执行
+4.IDA Trace
+5.binary ninja
+6.后端编译优化
+7.frida辅助分析</p>
+<h4 id="原帖">原帖
+</h4><p><a class="link" href="https://www.52pojie.cn/thread-1809646-1-1.html"  target="_blank" rel="noopener"
+    >https://www.52pojie.cn/thread-1809646-1-1.html</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">安卓逆向</a>
+        
+            <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/52study_10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（十）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/%E5%90%BE%E7%88%B1%E7%A0%B4%E8%A7%A3%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8%E5%8C%BAcrackme%E7%BB%83%E4%B9%A0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">52pjCrackMe</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_9/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（九）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_7/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（七）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_6/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（六）</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    
+    
+    <section class="totalcount">
+    
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+    发表了19篇文章 · 
+    总计3.67k字
+    </section>
+
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<a href="#" id="back-to-top" title="返回顶部"></a>
+
+
+<style>
+  #back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 55px;
+    width: 55px;
+    height: 55px;
+    border-radius: 7px;
+    background-color: rgba(64, 158, 255, 0.5);
+    box-shadow: var(--shadow-l2);
+    font-size: 30px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+  }
+
+  #back-to-top:before {
+    content: ' ';
+    display: inline-block;
+    position: relative;
+    top: 0;
+    transform: rotate(135deg);
+    height: 10px;
+    width: 10px;
+    border-width: 0 0 2px 2px;
+    border-color: var(--back-to-top-color);
+    border-style: solid;
+  }
+
+  #back-to-top:hover:before {
+    border-color: #2674e0;
+  }
+
+   
+  @media screen and (max-width: 768px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 10px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1024px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 40px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1280px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 55px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1536px) {
+    #back-to-top {
+      visibility: hidden;
+    }
+  }
+</style>
+
+
+<script>
+  function backToTop() {
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+    })
+  }
+
+  window.onload = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop > 0) {
+      totopBtn.style.display = 'inline'
+    } else {
+      totopBtn.style.display = 'none'
+    }
+  }
+
+  window.onscroll = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop < 200) {
+      totopBtn.style.display = 'none'
+    } else {
+      totopBtn.style.display = 'inline'
+      totopBtn.addEventListener('click', backToTop, false)
+    }
+  }
+</script>
+
+    </body>
+</html>

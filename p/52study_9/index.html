@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="frida基础知识\r操作模式: 操作模式 描述 优点 主要用途 CLI（命令行）模式 通过命令行直接将JavaScript脚本注入进程中，对进程进行操作 便于直接注入和操作 在较小规模的操作或者需求比较简单的场景中使用 RPC模式 使用Python进行JavaScript脚本的注入工作，实际对进程进行操作的还是JavaScript脚本，可以通过RPC传输给Python脚本来进行复杂数据的处理 在对复杂数据的处理上可以通过RPC传输给Python脚本来进行，有利于减少被注入进程的性能损耗 在大规模调用中更加普遍，特别是对于复杂数据处理的需求 注入模式与启动命令: 注入模式 描述 命令或参数 优点 主要用途 Spawn模式 将启动App的权利交由Frida来控制，即使目标App已经启动，在使用Frida注入程序时还是会重新启动App 在CLI模式中，Frida通过加上 -f 参数指定包名以spawn模式操作App 适合于需要在App启动时即进行注入的场景，可以在App启动时即捕获其行为 当需要监控App从启动开始的所有行为时使用 Attach模式 在目标App已经启动的情况下，Frida通过ptrace注入程序从而执行Hook的操作 在CLI模式中，如果不添加 -f 参数，则默认会通过attach模式注入App 适合于已经运行的App，不会重新启动App，对用户体验影响较小 在App已经启动，或者我们只关心特定时刻或特定功能的行为时使用 Spawn模式 1 frida -U -f 进程名 -l hook.js attach模式 ： 1 frida -U 进程名 -l hook.js frida常用API\r\u200b\t建议直接参考github文档，稍微了解一下即可，写脚本的时候直接使用gpt即可。 Objection\r\u200b\tobjection是基于frida的命令行hook集合工具, 可以让你不写代码, 敲几句命令就可以对java函数的高颗粒度hook, 还支持RPC调用。可以实现诸如内存搜索、类和模块搜索、方法hook打印参数返回值调用栈等常用功能，使用参考：frida进阶 Frida-Native-Hook\rfrida_inlineHook\rInline hook（内联钩子）是一种在程序运行时修改函数执行流程的技术。它通过修改函数的原始代码，将目标函数的执行路径重定向到自定义的代码段，从而实现对目标函数的拦截和修改。 简单来说就是可以对任意地址的指令进行hook读写操作 trace工具\r工具名称 描述 链接 jnitrace 老牌，经典，信息全，携带方便 jnitrace jnitrace-engine 基于jnitrace，可定制化 jnitrace-engine jtrace 定制方便，信息全面，直接在_agent.">
+<title>安卓逆向入门（九）</title>
+
+<link rel='canonical' href='https://zhu1ang.github.io/p/52study_9/'>
+
+<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="安卓逆向入门（九）">
+<meta property='og:description' content="frida基础知识\r操作模式: 操作模式 描述 优点 主要用途 CLI（命令行）模式 通过命令行直接将JavaScript脚本注入进程中，对进程进行操作 便于直接注入和操作 在较小规模的操作或者需求比较简单的场景中使用 RPC模式 使用Python进行JavaScript脚本的注入工作，实际对进程进行操作的还是JavaScript脚本，可以通过RPC传输给Python脚本来进行复杂数据的处理 在对复杂数据的处理上可以通过RPC传输给Python脚本来进行，有利于减少被注入进程的性能损耗 在大规模调用中更加普遍，特别是对于复杂数据处理的需求 注入模式与启动命令: 注入模式 描述 命令或参数 优点 主要用途 Spawn模式 将启动App的权利交由Frida来控制，即使目标App已经启动，在使用Frida注入程序时还是会重新启动App 在CLI模式中，Frida通过加上 -f 参数指定包名以spawn模式操作App 适合于需要在App启动时即进行注入的场景，可以在App启动时即捕获其行为 当需要监控App从启动开始的所有行为时使用 Attach模式 在目标App已经启动的情况下，Frida通过ptrace注入程序从而执行Hook的操作 在CLI模式中，如果不添加 -f 参数，则默认会通过attach模式注入App 适合于已经运行的App，不会重新启动App，对用户体验影响较小 在App已经启动，或者我们只关心特定时刻或特定功能的行为时使用 Spawn模式 1 frida -U -f 进程名 -l hook.js attach模式 ： 1 frida -U 进程名 -l hook.js frida常用API\r\u200b\t建议直接参考github文档，稍微了解一下即可，写脚本的时候直接使用gpt即可。 Objection\r\u200b\tobjection是基于frida的命令行hook集合工具, 可以让你不写代码, 敲几句命令就可以对java函数的高颗粒度hook, 还支持RPC调用。可以实现诸如内存搜索、类和模块搜索、方法hook打印参数返回值调用栈等常用功能，使用参考：frida进阶 Frida-Native-Hook\rfrida_inlineHook\rInline hook（内联钩子）是一种在程序运行时修改函数执行流程的技术。它通过修改函数的原始代码，将目标函数的执行路径重定向到自定义的代码段，从而实现对目标函数的拦截和修改。 简单来说就是可以对任意地址的指令进行hook读写操作 trace工具\r工具名称 描述 链接 jnitrace 老牌，经典，信息全，携带方便 jnitrace jnitrace-engine 基于jnitrace，可定制化 jnitrace-engine jtrace 定制方便，信息全面，直接在_agent.">
+<meta property='og:url' content='https://zhu1ang.github.io/p/52study_9/'>
+<meta property='og:site_name' content='剑饮雪'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='安卓逆向' /><meta property='article:tag' content='学习笔记' /><meta property='article:published_time' content='2024-11-08T14:28:29&#43;08:00'/><meta property='article:modified_time' content='2024-11-08T14:28:29&#43;08:00'/>
+<meta name="twitter:title" content="安卓逆向入门（九）">
+<meta name="twitter:description" content="frida基础知识\r操作模式: 操作模式 描述 优点 主要用途 CLI（命令行）模式 通过命令行直接将JavaScript脚本注入进程中，对进程进行操作 便于直接注入和操作 在较小规模的操作或者需求比较简单的场景中使用 RPC模式 使用Python进行JavaScript脚本的注入工作，实际对进程进行操作的还是JavaScript脚本，可以通过RPC传输给Python脚本来进行复杂数据的处理 在对复杂数据的处理上可以通过RPC传输给Python脚本来进行，有利于减少被注入进程的性能损耗 在大规模调用中更加普遍，特别是对于复杂数据处理的需求 注入模式与启动命令: 注入模式 描述 命令或参数 优点 主要用途 Spawn模式 将启动App的权利交由Frida来控制，即使目标App已经启动，在使用Frida注入程序时还是会重新启动App 在CLI模式中，Frida通过加上 -f 参数指定包名以spawn模式操作App 适合于需要在App启动时即进行注入的场景，可以在App启动时即捕获其行为 当需要监控App从启动开始的所有行为时使用 Attach模式 在目标App已经启动的情况下，Frida通过ptrace注入程序从而执行Hook的操作 在CLI模式中，如果不添加 -f 参数，则默认会通过attach模式注入App 适合于已经运行的App，不会重新启动App，对用户体验影响较小 在App已经启动，或者我们只关心特定时刻或特定功能的行为时使用 Spawn模式 1 frida -U -f 进程名 -l hook.js attach模式 ： 1 frida -U 进程名 -l hook.js frida常用API\r\u200b\t建议直接参考github文档，稍微了解一下即可，写脚本的时候直接使用gpt即可。 Objection\r\u200b\tobjection是基于frida的命令行hook集合工具, 可以让你不写代码, 敲几句命令就可以对java函数的高颗粒度hook, 还支持RPC调用。可以实现诸如内存搜索、类和模块搜索、方法hook打印参数返回值调用栈等常用功能，使用参考：frida进阶 Frida-Native-Hook\rfrida_inlineHook\rInline hook（内联钩子）是一种在程序运行时修改函数执行流程的技术。它通过修改函数的原始代码，将目标函数的执行路径重定向到自定义的代码段，从而实现对目标函数的拦截和修改。 简单来说就是可以对任意地址的指令进行hook读写操作 trace工具\r工具名称 描述 链接 jnitrace 老牌，经典，信息全，携带方便 jnitrace jnitrace-engine 基于jnitrace，可定制化 jnitrace-engine jtrace 定制方便，信息全面，直接在_agent.">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Ukenn2112/UkennWeb@3.0/index/web.js"></script>
+        <div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ico_hu627d1395d31b147b1726fc8be242e34e_39784_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">剑饮雪</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/zhu1ang'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#frida基础知识">frida基础知识</a></li>
+            <li><a href="#frida常用api">frida常用API</a></li>
+            <li><a href="#objection">Objection</a></li>
+            <li><a href="#frida-native-hook">Frida-Native-Hook</a></li>
+            <li><a href="#frida各类hook方案学习">Frida各类hook方案学习</a></li>
+            <li><a href="#原帖">原帖</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" >
+                安卓逆向
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/52study_9/">安卓逆向入门（九）</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Nov 08, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h4 id="frida基础知识">frida基础知识
+</h4><p>操作模式:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:left">操作模式</th>
+<th style="text-align:left">描述</th>
+<th style="text-align:left">优点</th>
+<th style="text-align:left">主要用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">CLI（命令行）模式</td>
+<td style="text-align:left">通过命令行直接将JavaScript脚本注入进程中，对进程进行操作</td>
+<td style="text-align:left">便于直接注入和操作</td>
+<td style="text-align:left">在较小规模的操作或者需求比较简单的场景中使用</td>
+</tr>
+<tr>
+<td style="text-align:left">RPC模式</td>
+<td style="text-align:left">使用Python进行JavaScript脚本的注入工作，实际对进程进行操作的还是JavaScript脚本，可以通过RPC传输给Python脚本来进行复杂数据的处理</td>
+<td style="text-align:left">在对复杂数据的处理上可以通过RPC传输给Python脚本来进行，有利于减少被注入进程的性能损耗</td>
+<td style="text-align:left">在大规模调用中更加普遍，特别是对于复杂数据处理的需求</td>
+</tr>
+</tbody>
+</table></div>
+<p>注入模式与启动命令:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:left">注入模式</th>
+<th style="text-align:left">描述</th>
+<th style="text-align:left">命令或参数</th>
+<th style="text-align:left">优点</th>
+<th style="text-align:left">主要用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Spawn模式</td>
+<td style="text-align:left">将启动App的权利交由Frida来控制，即使目标App已经启动，在使用Frida注入程序时还是会重新启动App</td>
+<td style="text-align:left">在CLI模式中，Frida通过加上 -f 参数指定包名以spawn模式操作App</td>
+<td style="text-align:left">适合于需要在App启动时即进行注入的场景，可以在App启动时即捕获其行为</td>
+<td style="text-align:left">当需要监控App从启动开始的所有行为时使用</td>
+</tr>
+<tr>
+<td style="text-align:left">Attach模式</td>
+<td style="text-align:left">在目标App已经启动的情况下，Frida通过ptrace注入程序从而执行Hook的操作</td>
+<td style="text-align:left">在CLI模式中，如果不添加 -f 参数，则默认会通过attach模式注入App</td>
+<td style="text-align:left">适合于已经运行的App，不会重新启动App，对用户体验影响较小</td>
+<td style="text-align:left">在App已经启动，或者我们只关心特定时刻或特定功能的行为时使用</td>
+</tr>
+</tbody>
+</table></div>
+<p>Spawn模式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">frida -U -f 进程名 -l hook.js
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>attach模式 ：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">frida -U 进程名 -l hook.js
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="frida常用api">frida常用API
+</h4><p>​	建议直接参考<a class="link" href="[github.com]%28https://github.com/iddoeldor/frida-snippets?tab=readme-ov-file#binder-transactions%29" >github文档</a>，稍微了解一下即可，写脚本的时候直接使用gpt即可。</p>
+<h4 id="objection">Objection
+</h4><p>​	objection是基于frida的命令行hook集合工具, 可以让你不写代码, 敲几句命令就可以对java函数的高颗粒度hook, 还支持RPC调用。可以实现诸如内存搜索、类和模块搜索、方法hook打印参数返回值调用栈等常用功能，使用参考：<a class="link" href="https://www.anquanke.com/post/id/197657#h2-0"  target="_blank" rel="noopener"
+    >frida进阶</a></p>
+<h4 id="frida-native-hook">Frida-Native-Hook
+</h4><h5 id="frida_inlinehook">frida_inlineHook
+</h5><p>Inline hook（内联钩子）是一种在程序运行时修改函数执行流程的技术。<strong>它通过修改函数的原始代码，将目标函数的执行路径重定向到自定义的代码段，从而实现对目标函数的拦截和修改。</strong>
+简单来说就是可以对任意地址的指令进行hook读写操作</p>
+<h5 id="trace工具">trace工具
+</h5><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:left">工具名称</th>
+<th style="text-align:left">描述</th>
+<th style="text-align:left">链接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">jnitrace</td>
+<td style="text-align:left">老牌，经典，信息全，携带方便</td>
+<td style="text-align:left"><a class="link" href="https://github.com/chame1eon/jnitrace"  target="_blank" rel="noopener"
+    >jnitrace</a></td>
+</tr>
+<tr>
+<td style="text-align:left">jnitrace-engine</td>
+<td style="text-align:left">基于jnitrace，可定制化</td>
+<td style="text-align:left"><a class="link" href="https://github.com/chame1eon/jnitrace-engine"  target="_blank" rel="noopener"
+    >jnitrace-engine</a></td>
+</tr>
+<tr>
+<td style="text-align:left">jtrace</td>
+<td style="text-align:left">定制方便，信息全面，直接在_agent.js或者_agent_stable.js 里面加自己的逻辑就行</td>
+<td style="text-align:left"><a class="link" href="https://github.com/SeeFlowerX/jtrace"  target="_blank" rel="noopener"
+    >jtrace</a></td>
+</tr>
+<tr>
+<td style="text-align:left">hook_art.js</td>
+<td style="text-align:left">可提供jni trace，可以灵活的增加你需要hook的函数</td>
+<td style="text-align:left"><a class="link" href="https://github.com/lasting-yang/frida_hook_libart"  target="_blank" rel="noopener"
+    >hook_art.js</a></td>
+</tr>
+<tr>
+<td style="text-align:left">JNI-Frida-Hook</td>
+<td style="text-align:left">函数名已定义，方便定位</td>
+<td style="text-align:left"><a class="link" href="https://github.com/Areizen/JNI-Frida-Hook"  target="_blank" rel="noopener"
+    >JNI-Frida-Hook</a></td>
+</tr>
+<tr>
+<td style="text-align:left">findhash</td>
+<td style="text-align:left">ida插件，可用于检测加解密函数，也可作为Native Trace库</td>
+<td style="text-align:left"><a class="link" href="https://github.com/Pr0214/findhash"  target="_blank" rel="noopener"
+    >findhash</a></td>
+</tr>
+<tr>
+<td style="text-align:left">Stalker</td>
+<td style="text-align:left">frida官方提供的代码跟踪引擎，可以在Native层方法级别，块级别，指令级别实现代码修改，代码跟踪</td>
+<td style="text-align:left"><a class="link" href="https://frida.re/docs/stalker/"  target="_blank" rel="noopener"
+    >Stalker</a></td>
+</tr>
+<tr>
+<td style="text-align:left">sktrace</td>
+<td style="text-align:left">类似 ida 指令 trace 功能</td>
+<td style="text-align:left"><a class="link" href="https://github.com/bmax121/sktrace"  target="_blank" rel="noopener"
+    >sktrace</a></td>
+</tr>
+<tr>
+<td style="text-align:left">frida-qbdi-tracer</td>
+<td style="text-align:left">速度比frida stalker快，免补环境</td>
+<td style="text-align:left"><a class="link" href="https://github.com/lasting-yang/frida-qbdi-tracer"  target="_blank" rel="noopener"
+    >frida-qbdi-tracer</a></td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="frida各类hook方案学习">Frida各类hook方案学习
+</h4><h5 id="xposed-hook">xposed hook
+</h5><p>​	Xposed通过修改Art虚拟机，将需要hook的函数注册为Native函数，当执行这一函数时，虚拟机会优先执行Native函数，然后执行java函数，这样就成功完成了函数的hook。</p>
+<p>​	主要的hook方式是通过编写Xposed模块，基本流程：</p>
+<p>(1)拷贝XposedBridgeApi.jar到新建工程的libs目录
+(2)修改app目录下的build.gradle文件，在AndroidManifest.xml中增加Xposed相关内容
+(3)新建hook类，编写hook代码
+(4)新建assets文件夹，然后在assets目录下新建文件xposed_init,在里面写上hook类的完整路径</p>
+<h5 id="frida-hook">Frida hook
+</h5><p>​	Frida的原理同Xposed，修改Java method为native method。在ART和Dalivk中略有不同。</p>
+<p>​	主要的hook方式是通过编写注入脚本或者集成objection工具</p>
+<h5 id="inline-hook">inline hook
+</h5><p>​	inline Hook是一种拦截目标函数调用的方法，主要用于杀毒软件、沙箱和恶意软件。一般的想法是将一个函数重定向到我们自己的函数，以便我们可以在函数执行它之前和/或之后执行处理；这可能包括：检查参数、填充、记录、欺骗返回的数据和过滤调用。</p>
+<p>​	hook是通过直接修改目标函数内的代码来放置，通常是用跳转覆盖的前几个字节，允许在函数进行任何处理之前重定向执行。</p>
+<p>​	Android-lnline-Hook和SandHook都是基于inlinehook的两种开源框架。</p>
+<p>Android-lnline-Hook对一个目标so文件hook步骤如下：</p>
+<p>（1）我们获取so的handler，使用dlopen函数
+void* libhandler = dlopen(&ldquo;libc.so&rdquo;,RTLD_NOW);</p>
+<p>（2）我们获取hook目标函数的地址,使用dlsym函数
+void* strstr_addr = dlsym(libhandler,函数名);
+（3）声明原来的函数
+void* (<em>oldmethod)(char</em>,char*); //这个格式需要参考hook的函数
+声明现在的函数
+void* newmethod(char* a,char* b){
+return (void *)oldmethod(a,b);
+}</p>
+<p>（4）使用registerInlinehook进行重定向，将hook函数地址重定向我们编写的新函数上
+(registerInlineHook((uint32_t) strstr_addr, (uint32_t) new_strstr, (uint32_t **) &amp;old_strstr) != ELE7EN_OK
+//参数一：hook函数的地址 参数二：替换函数的地址  参数3：用来保存原来函数的地址</p>
+<p>（5）我们判断我们的hook操作是否成功,并且再次调用实现hook
+(inlineHook((uint32_t) strstr_addr) == ELE7EN_OK)</p>
+<p>SandHook使用姿势：</p>
+<p>（1）导包，将SandHook中cpp文件夹下的包全部导入到项目中，并修改CMakeLists.txt中添加native.cpp, 修改java层导入so库为sandHook-native
+（2）配置相关的环境
+在配置文件build.gradle中配置
+externalNativeBuild {
+cmake {
+arguments &lsquo;-DBUILD_TESTING=OFF&rsquo;
+cppFlags &ldquo;-frtti -fexceptions -Wpointer-arith&rdquo;
+abiFilters &lsquo;armeabi-v7a&rsquo;, &lsquo;arm64-v8a&rsquo;
+}
+}</p>
+<p>（3）编译可以成功通过
+（4）使用
+const char * libc = &ldquo;/system/lib64/libc.so&rdquo;;
+old_fopen = reinterpret_cast&lt;void <em>(</em>)(char *, char *)&gt;(SandInlineHookSym(libc, &ldquo;fopen&rdquo;,
+reinterpret_cast&lt;void *&gt;(new_fopen)));
+参数2：hook的函数 参数3：新的函数</p>
+<p>添加原理hook旧函数的声明
+void* (<em>old_fopen)(char</em>,char*);
+实现新的函数功能
+void* new_fopen(char* a,char* b){
+__android_log_print(6,&ldquo;windaa&rdquo;,&ldquo;I am from new open %s&rdquo;,a);
+return old_fopen(a,b);
+}</p>
+<p>（5）运行测试是否成功启动</p>
+<h5 id="unicorn-hook">unicorn hook
+</h5><p>​	unidbg</p>
+<h4 id="原帖">原帖
+</h4><p><a class="link" href="https://www.52pojie.cn/thread-1823118-1-1.html"  target="_blank" rel="noopener"
+    >https://www.52pojie.cn/thread-1823118-1-1.html</a></p>
+<p><a class="link" href="https://bbs.kanxue.com/thread-272870-1.htm"  target="_blank" rel="noopener"
+    >https://bbs.kanxue.com/thread-272870-1.htm</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">安卓逆向</a>
+        
+            <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/52study_10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（十）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/%E5%90%BE%E7%88%B1%E7%A0%B4%E8%A7%A3%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8%E5%8C%BAcrackme%E7%BB%83%E4%B9%A0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">52pjCrackMe</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（八）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_7/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（七）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_6/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（六）</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    
+    
+    <section class="totalcount">
+    
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+    发表了19篇文章 · 
+    总计3.67k字
+    </section>
+
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<a href="#" id="back-to-top" title="返回顶部"></a>
+
+
+<style>
+  #back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 55px;
+    width: 55px;
+    height: 55px;
+    border-radius: 7px;
+    background-color: rgba(64, 158, 255, 0.5);
+    box-shadow: var(--shadow-l2);
+    font-size: 30px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+  }
+
+  #back-to-top:before {
+    content: ' ';
+    display: inline-block;
+    position: relative;
+    top: 0;
+    transform: rotate(135deg);
+    height: 10px;
+    width: 10px;
+    border-width: 0 0 2px 2px;
+    border-color: var(--back-to-top-color);
+    border-style: solid;
+  }
+
+  #back-to-top:hover:before {
+    border-color: #2674e0;
+  }
+
+   
+  @media screen and (max-width: 768px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 10px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1024px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 40px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1280px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 55px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1536px) {
+    #back-to-top {
+      visibility: hidden;
+    }
+  }
+</style>
+
+
+<script>
+  function backToTop() {
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+    })
+  }
+
+  window.onload = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop > 0) {
+      totopBtn.style.display = 'inline'
+    } else {
+      totopBtn.style.display = 'none'
+    }
+  }
+
+  window.onscroll = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop < 200) {
+      totopBtn.style.display = 'none'
+    } else {
+      totopBtn.style.display = 'inline'
+      totopBtn.addEventListener('click', backToTop, false)
+    }
+  }
+</script>
+
+    </body>
+</html>

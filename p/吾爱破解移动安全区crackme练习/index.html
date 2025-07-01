@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="题目\r新手练手学习挺好的 思路\rapk比较简单，在MainActivity里能发现，疑似密码的字符串和配套的逻辑（正确错误字符串提示 于是直接根据这里的解密逻辑，From Base64(input_str + 1) = &ldquo;52pojieCrackMe2020&rdquo;，将解密得到的字符串输入：MS5ub2JqZUVjcmFja01lMjAyMA==，但是结果不对 再仔细回看这段代码，发现这里真正的click方法应该是View.OnClickListener 而可以在Activity类里发现，AnonymousClass1实现了这个接口 并且具体的方法是在本地的lib0.0.so文件里的，然后转到IDA 不是很擅长分析so，但是这里应该才是正确的匹配密码 在匹配监听器里发现了，自定义的base64编码表 解密脚本： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 import base64 # 自定义Base64变种字符集 base64_variants = &#34;KLMNOPQRSTABCDEFGHIJUVWXYZabcdopqrstuvwxefghijklmnyz0123456789+/&#34; # 标准Base64字符集 base64_standard = &#34;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&#34; # 创建映射字典 variant_to_standard = {base64_standard[i]: base64_variants[i] for i in range(len(base64_standard))} # 对字符串进行标准Base64编码 input_string = &#34;52pojie2020CM&#34; encoded_standard = base64.b64encode(input_string.encode()).decode() # 将标准Base64编码转为变种Base64编码，跳过 &#39;=&#39; 填充符号 encoded_variant = &#39;&#39;.">
+<title>52pjCrackMe</title>
+
+<link rel='canonical' href='https://zhu1ang.github.io/p/%E5%90%BE%E7%88%B1%E7%A0%B4%E8%A7%A3%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8%E5%8C%BAcrackme%E7%BB%83%E4%B9%A0/'>
+
+<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="52pjCrackMe">
+<meta property='og:description' content="题目\r新手练手学习挺好的 思路\rapk比较简单，在MainActivity里能发现，疑似密码的字符串和配套的逻辑（正确错误字符串提示 于是直接根据这里的解密逻辑，From Base64(input_str + 1) = &ldquo;52pojieCrackMe2020&rdquo;，将解密得到的字符串输入：MS5ub2JqZUVjcmFja01lMjAyMA==，但是结果不对 再仔细回看这段代码，发现这里真正的click方法应该是View.OnClickListener 而可以在Activity类里发现，AnonymousClass1实现了这个接口 并且具体的方法是在本地的lib0.0.so文件里的，然后转到IDA 不是很擅长分析so，但是这里应该才是正确的匹配密码 在匹配监听器里发现了，自定义的base64编码表 解密脚本： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 import base64 # 自定义Base64变种字符集 base64_variants = &#34;KLMNOPQRSTABCDEFGHIJUVWXYZabcdopqrstuvwxefghijklmnyz0123456789+/&#34; # 标准Base64字符集 base64_standard = &#34;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&#34; # 创建映射字典 variant_to_standard = {base64_standard[i]: base64_variants[i] for i in range(len(base64_standard))} # 对字符串进行标准Base64编码 input_string = &#34;52pojie2020CM&#34; encoded_standard = base64.b64encode(input_string.encode()).decode() # 将标准Base64编码转为变种Base64编码，跳过 &#39;=&#39; 填充符号 encoded_variant = &#39;&#39;.">
+<meta property='og:url' content='https://zhu1ang.github.io/p/%E5%90%BE%E7%88%B1%E7%A0%B4%E8%A7%A3%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8%E5%8C%BAcrackme%E7%BB%83%E4%B9%A0/'>
+<meta property='og:site_name' content='剑饮雪'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='安卓逆向' /><meta property='article:tag' content='学习笔记' /><meta property='article:published_time' content='2025-02-20T14:31:34&#43;08:00'/><meta property='article:modified_time' content='2025-02-20T14:31:34&#43;08:00'/>
+<meta name="twitter:title" content="52pjCrackMe">
+<meta name="twitter:description" content="题目\r新手练手学习挺好的 思路\rapk比较简单，在MainActivity里能发现，疑似密码的字符串和配套的逻辑（正确错误字符串提示 于是直接根据这里的解密逻辑，From Base64(input_str + 1) = &ldquo;52pojieCrackMe2020&rdquo;，将解密得到的字符串输入：MS5ub2JqZUVjcmFja01lMjAyMA==，但是结果不对 再仔细回看这段代码，发现这里真正的click方法应该是View.OnClickListener 而可以在Activity类里发现，AnonymousClass1实现了这个接口 并且具体的方法是在本地的lib0.0.so文件里的，然后转到IDA 不是很擅长分析so，但是这里应该才是正确的匹配密码 在匹配监听器里发现了，自定义的base64编码表 解密脚本： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 import base64 # 自定义Base64变种字符集 base64_variants = &#34;KLMNOPQRSTABCDEFGHIJUVWXYZabcdopqrstuvwxefghijklmnyz0123456789+/&#34; # 标准Base64字符集 base64_standard = &#34;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&#34; # 创建映射字典 variant_to_standard = {base64_standard[i]: base64_variants[i] for i in range(len(base64_standard))} # 对字符串进行标准Base64编码 input_string = &#34;52pojie2020CM&#34; encoded_standard = base64.b64encode(input_string.encode()).decode() # 将标准Base64编码转为变种Base64编码，跳过 &#39;=&#39; 填充符号 encoded_variant = &#39;&#39;.">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Ukenn2112/UkennWeb@3.0/index/web.js"></script>
+        <div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ico_hu627d1395d31b147b1726fc8be242e34e_39784_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">剑饮雪</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/zhu1ang'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#题目">题目</a></li>
+            <li><a href="#思路">思路</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" >
+                安卓逆向
+            </a>
+        
+            <a href="/categories/crackme/" >
+                Crackme
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E5%90%BE%E7%88%B1%E7%A0%B4%E8%A7%A3%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8%E5%8C%BAcrackme%E7%BB%83%E4%B9%A0/">52pjCrackMe</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 20, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h4 id="题目">题目
+</h4><p><a class="link" href="https://www.52pojie.cn/thread-1149540-1-1.html"  target="_blank" rel="noopener"
+    >新手练手学习挺好的</a></p>
+<h4 id="思路">思路
+</h4><p>apk比较简单，在MainActivity里能发现，疑似密码的字符串和配套的逻辑（正确错误字符串提示</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201439213.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20250220143924083"
+	
+	
+></p>
+<p>于是直接根据这里的解密逻辑，From Base64(input_str + 1) = &ldquo;52pojieCrackMe2020&rdquo;，将解密得到的字符串输入：MS5ub2JqZUVjcmFja01lMjAyMA==，但是结果不对</p>
+<p>再仔细回看这段代码，发现这里真正的click方法应该是View.OnClickListener</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201450496.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20250220145044457"
+	
+	
+></p>
+<p>而可以在Activity类里发现，AnonymousClass1实现了这个接口 <img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201453407.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20250220145316366"
+	
+	
+></p>
+<p>并且具体的方法是在本地的lib0.0.so文件里的，然后转到IDA</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201455843.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20250220145522806"
+	
+	
+></p>
+<p>不是很擅长分析so，但是这里应该才是正确的匹配密码</p>
+<p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201458719.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20250220145816689"
+	
+	
+></p>
+<p>在匹配监听器里发现了，自定义的base64编码表</p>
+<p>解密脚本：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">base64</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 自定义Base64变种字符集</span>
+</span></span><span class="line"><span class="cl"><span class="n">base64_variants</span> <span class="o">=</span> <span class="s2">&#34;KLMNOPQRSTABCDEFGHIJUVWXYZabcdopqrstuvwxefghijklmnyz0123456789+/&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 标准Base64字符集</span>
+</span></span><span class="line"><span class="cl"><span class="n">base64_standard</span> <span class="o">=</span> <span class="s2">&#34;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 创建映射字典</span>
+</span></span><span class="line"><span class="cl"><span class="n">variant_to_standard</span> <span class="o">=</span> <span class="p">{</span><span class="n">base64_standard</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">base64_variants</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">base64_standard</span><span class="p">))}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 对字符串进行标准Base64编码</span>
+</span></span><span class="line"><span class="cl"><span class="n">input_string</span> <span class="o">=</span> <span class="s2">&#34;52pojie2020CM&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">encoded_standard</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">input_string</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 将标准Base64编码转为变种Base64编码，跳过 &#39;=&#39; 填充符号</span>
+</span></span><span class="line"><span class="cl"><span class="n">encoded_variant</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">variant_to_standard</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">encoded_standard</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Encoded using variant Base64: </span><span class="si">{</span><span class="n">encoded_variant</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201459047.png?x-oss-process=style/zzz"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20250220145911017"
+	
+	
+></p>
+<img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201500590.png?x-oss-process=style/zzz" alt="Screenshot_20250220-015955[1]" style="zoom:25%;" />
+<p>但是不知道怎么能从IDA的代码里看出来变种base编码，只能看到映射表去猜。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">安卓逆向</a>
+        
+            <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/52study_10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（十）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_9/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（九）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（八）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_7/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（七）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/52study_6/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安卓逆向入门（六）</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    
+    
+    <section class="totalcount">
+    
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+    发表了19篇文章 · 
+    总计3.67k字
+    </section>
+
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<a href="#" id="back-to-top" title="返回顶部"></a>
+
+
+<style>
+  #back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 55px;
+    width: 55px;
+    height: 55px;
+    border-radius: 7px;
+    background-color: rgba(64, 158, 255, 0.5);
+    box-shadow: var(--shadow-l2);
+    font-size: 30px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+  }
+
+  #back-to-top:before {
+    content: ' ';
+    display: inline-block;
+    position: relative;
+    top: 0;
+    transform: rotate(135deg);
+    height: 10px;
+    width: 10px;
+    border-width: 0 0 2px 2px;
+    border-color: var(--back-to-top-color);
+    border-style: solid;
+  }
+
+  #back-to-top:hover:before {
+    border-color: #2674e0;
+  }
+
+   
+  @media screen and (max-width: 768px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 10px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1024px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 40px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1280px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 55px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1536px) {
+    #back-to-top {
+      visibility: hidden;
+    }
+  }
+</style>
+
+
+<script>
+  function backToTop() {
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+    })
+  }
+
+  window.onload = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop > 0) {
+      totopBtn.style.display = 'inline'
+    } else {
+      totopBtn.style.display = 'none'
+    }
+  }
+
+  window.onscroll = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop < 200) {
+      totopBtn.style.display = 'none'
+    } else {
+      totopBtn.style.display = 'inline'
+      totopBtn.addEventListener('click', backToTop, false)
+    }
+  }
+</script>
+
+    </body>
+</html>

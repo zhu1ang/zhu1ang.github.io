@@ -7,7 +7,612 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>zhu1ang</copyright>
-        <lastBuildDate>Thu, 24 Oct 2024 10:14:13 +0800</lastBuildDate><atom:link href="https://zhu1ang.github.io/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Wed, 26 Feb 2025 14:16:12 +0800</lastBuildDate><atom:link href="https://zhu1ang.github.io/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>安卓逆向入门（十）</title>
+        <link>https://zhu1ang.github.io/p/52study_10/</link>
+        <pubDate>Wed, 26 Feb 2025 14:16:12 +0800</pubDate>
+        
+        <guid>https://zhu1ang.github.io/p/52study_10/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>52pjCrackMe</title>
+        <link>https://zhu1ang.github.io/p/%E5%90%BE%E7%88%B1%E7%A0%B4%E8%A7%A3%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8%E5%8C%BAcrackme%E7%BB%83%E4%B9%A0/</link>
+        <pubDate>Thu, 20 Feb 2025 14:31:34 +0800</pubDate>
+        
+        <guid>https://zhu1ang.github.io/p/%E5%90%BE%E7%88%B1%E7%A0%B4%E8%A7%A3%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8%E5%8C%BAcrackme%E7%BB%83%E4%B9%A0/</guid>
+        <description>&lt;h4 id=&#34;题目&#34;&gt;题目
+&lt;/h4&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.52pojie.cn/thread-1149540-1-1.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;新手练手学习挺好的&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;思路&#34;&gt;思路
+&lt;/h4&gt;&lt;p&gt;apk比较简单，在MainActivity里能发现，疑似密码的字符串和配套的逻辑（正确错误字符串提示&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201439213.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250220143924083&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;于是直接根据这里的解密逻辑，From Base64(input_str + 1) = &amp;ldquo;52pojieCrackMe2020&amp;rdquo;，将解密得到的字符串输入：MS5ub2JqZUVjcmFja01lMjAyMA==，但是结果不对&lt;/p&gt;
+&lt;p&gt;再仔细回看这段代码，发现这里真正的click方法应该是View.OnClickListener&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201450496.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250220145044457&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;而可以在Activity类里发现，AnonymousClass1实现了这个接口 &lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201453407.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250220145316366&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;并且具体的方法是在本地的lib0.0.so文件里的，然后转到IDA&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201455843.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250220145522806&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;不是很擅长分析so，但是这里应该才是正确的匹配密码&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201458719.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250220145816689&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在匹配监听器里发现了，自定义的base64编码表&lt;/p&gt;
+&lt;p&gt;解密脚本：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;base64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 自定义Base64变种字符集&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;base64_variants&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;KLMNOPQRSTABCDEFGHIJUVWXYZabcdopqrstuvwxefghijklmnyz0123456789+/&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 标准Base64字符集&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;base64_standard&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 创建映射字典&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;variant_to_standard&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;base64_standard&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;base64_variants&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;base64_standard&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 对字符串进行标准Base64编码&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;input_string&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;52pojie2020CM&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;encoded_standard&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;base64&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;b64encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;input_string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;())&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 将标准Base64编码转为变种Base64编码，跳过 &amp;#39;=&amp;#39; 填充符号&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;encoded_variant&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;join&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;([&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;variant_to_standard&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;get&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;char&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;char&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;encoded_standard&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;sa&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Encoded using variant Base64: &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encoded_variant&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201459047.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20250220145911017&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202502201500590.png?x-oss-process=style/zzz&#34; alt=&#34;Screenshot_20250220-015955[1]&#34; style=&#34;zoom:25%;&#34; /&gt;
+&lt;p&gt;但是不知道怎么能从IDA的代码里看出来变种base编码，只能看到映射表去猜。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>安卓逆向入门（九）</title>
+        <link>https://zhu1ang.github.io/p/52study_9/</link>
+        <pubDate>Fri, 08 Nov 2024 14:28:29 +0800</pubDate>
+        
+        <guid>https://zhu1ang.github.io/p/52study_9/</guid>
+        <description>&lt;h4 id=&#34;frida基础知识&#34;&gt;frida基础知识
+&lt;/h4&gt;&lt;p&gt;操作模式:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;操作模式&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;描述&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;优点&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;主要用途&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;CLI（命令行）模式&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;通过命令行直接将JavaScript脚本注入进程中，对进程进行操作&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;便于直接注入和操作&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在较小规模的操作或者需求比较简单的场景中使用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;RPC模式&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;使用Python进行JavaScript脚本的注入工作，实际对进程进行操作的还是JavaScript脚本，可以通过RPC传输给Python脚本来进行复杂数据的处理&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在对复杂数据的处理上可以通过RPC传输给Python脚本来进行，有利于减少被注入进程的性能损耗&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在大规模调用中更加普遍，特别是对于复杂数据处理的需求&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;注入模式与启动命令:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;注入模式&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;描述&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;命令或参数&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;优点&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;主要用途&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Spawn模式&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;将启动App的权利交由Frida来控制，即使目标App已经启动，在使用Frida注入程序时还是会重新启动App&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在CLI模式中，Frida通过加上 -f 参数指定包名以spawn模式操作App&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;适合于需要在App启动时即进行注入的场景，可以在App启动时即捕获其行为&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;当需要监控App从启动开始的所有行为时使用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Attach模式&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在目标App已经启动的情况下，Frida通过ptrace注入程序从而执行Hook的操作&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在CLI模式中，如果不添加 -f 参数，则默认会通过attach模式注入App&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;适合于已经运行的App，不会重新启动App，对用户体验影响较小&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在App已经启动，或者我们只关心特定时刻或特定功能的行为时使用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Spawn模式&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;frida -U -f 进程名 -l hook.js
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;attach模式 ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;frida -U 进程名 -l hook.js
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id=&#34;frida常用api&#34;&gt;frida常用API
+&lt;/h4&gt;&lt;p&gt;​	建议直接参考&lt;a class=&#34;link&#34; href=&#34;[github.com]%28https://github.com/iddoeldor/frida-snippets?tab=readme-ov-file#binder-transactions%29&#34; &gt;github文档&lt;/a&gt;，稍微了解一下即可，写脚本的时候直接使用gpt即可。&lt;/p&gt;
+&lt;h4 id=&#34;objection&#34;&gt;Objection
+&lt;/h4&gt;&lt;p&gt;​	objection是基于frida的命令行hook集合工具, 可以让你不写代码, 敲几句命令就可以对java函数的高颗粒度hook, 还支持RPC调用。可以实现诸如内存搜索、类和模块搜索、方法hook打印参数返回值调用栈等常用功能，使用参考：&lt;a class=&#34;link&#34; href=&#34;https://www.anquanke.com/post/id/197657#h2-0&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;frida进阶&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;frida-native-hook&#34;&gt;Frida-Native-Hook
+&lt;/h4&gt;&lt;h5 id=&#34;frida_inlinehook&#34;&gt;frida_inlineHook
+&lt;/h5&gt;&lt;p&gt;Inline hook（内联钩子）是一种在程序运行时修改函数执行流程的技术。&lt;strong&gt;它通过修改函数的原始代码，将目标函数的执行路径重定向到自定义的代码段，从而实现对目标函数的拦截和修改。&lt;/strong&gt;
+简单来说就是可以对任意地址的指令进行hook读写操作&lt;/p&gt;
+&lt;h5 id=&#34;trace工具&#34;&gt;trace工具
+&lt;/h5&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;工具名称&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;描述&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;链接&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;jnitrace&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;老牌，经典，信息全，携带方便&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/chame1eon/jnitrace&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;jnitrace&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;jnitrace-engine&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;基于jnitrace，可定制化&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/chame1eon/jnitrace-engine&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;jnitrace-engine&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;jtrace&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;定制方便，信息全面，直接在_agent.js或者_agent_stable.js 里面加自己的逻辑就行&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/SeeFlowerX/jtrace&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;jtrace&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;hook_art.js&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;可提供jni trace，可以灵活的增加你需要hook的函数&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/lasting-yang/frida_hook_libart&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;hook_art.js&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;JNI-Frida-Hook&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;函数名已定义，方便定位&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/Areizen/JNI-Frida-Hook&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;JNI-Frida-Hook&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;findhash&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;ida插件，可用于检测加解密函数，也可作为Native Trace库&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/Pr0214/findhash&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;findhash&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Stalker&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;frida官方提供的代码跟踪引擎，可以在Native层方法级别，块级别，指令级别实现代码修改，代码跟踪&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://frida.re/docs/stalker/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Stalker&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;sktrace&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;类似 ida 指令 trace 功能&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/bmax121/sktrace&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;sktrace&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;frida-qbdi-tracer&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;速度比frida stalker快，免补环境&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/lasting-yang/frida-qbdi-tracer&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;frida-qbdi-tracer&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;frida各类hook方案学习&#34;&gt;Frida各类hook方案学习
+&lt;/h4&gt;&lt;h5 id=&#34;xposed-hook&#34;&gt;xposed hook
+&lt;/h5&gt;&lt;p&gt;​	Xposed通过修改Art虚拟机，将需要hook的函数注册为Native函数，当执行这一函数时，虚拟机会优先执行Native函数，然后执行java函数，这样就成功完成了函数的hook。&lt;/p&gt;
+&lt;p&gt;​	主要的hook方式是通过编写Xposed模块，基本流程：&lt;/p&gt;
+&lt;p&gt;(1)拷贝XposedBridgeApi.jar到新建工程的libs目录
+(2)修改app目录下的build.gradle文件，在AndroidManifest.xml中增加Xposed相关内容
+(3)新建hook类，编写hook代码
+(4)新建assets文件夹，然后在assets目录下新建文件xposed_init,在里面写上hook类的完整路径&lt;/p&gt;
+&lt;h5 id=&#34;frida-hook&#34;&gt;Frida hook
+&lt;/h5&gt;&lt;p&gt;​	Frida的原理同Xposed，修改Java method为native method。在ART和Dalivk中略有不同。&lt;/p&gt;
+&lt;p&gt;​	主要的hook方式是通过编写注入脚本或者集成objection工具&lt;/p&gt;
+&lt;h5 id=&#34;inline-hook&#34;&gt;inline hook
+&lt;/h5&gt;&lt;p&gt;​	inline Hook是一种拦截目标函数调用的方法，主要用于杀毒软件、沙箱和恶意软件。一般的想法是将一个函数重定向到我们自己的函数，以便我们可以在函数执行它之前和/或之后执行处理；这可能包括：检查参数、填充、记录、欺骗返回的数据和过滤调用。&lt;/p&gt;
+&lt;p&gt;​	hook是通过直接修改目标函数内的代码来放置，通常是用跳转覆盖的前几个字节，允许在函数进行任何处理之前重定向执行。&lt;/p&gt;
+&lt;p&gt;​	Android-lnline-Hook和SandHook都是基于inlinehook的两种开源框架。&lt;/p&gt;
+&lt;p&gt;Android-lnline-Hook对一个目标so文件hook步骤如下：&lt;/p&gt;
+&lt;p&gt;（1）我们获取so的handler，使用dlopen函数
+void* libhandler = dlopen(&amp;ldquo;libc.so&amp;rdquo;,RTLD_NOW);&lt;/p&gt;
+&lt;p&gt;（2）我们获取hook目标函数的地址,使用dlsym函数
+void* strstr_addr = dlsym(libhandler,函数名);
+（3）声明原来的函数
+void* (&lt;em&gt;oldmethod)(char&lt;/em&gt;,char*); //这个格式需要参考hook的函数
+声明现在的函数
+void* newmethod(char* a,char* b){
+return (void *)oldmethod(a,b);
+}&lt;/p&gt;
+&lt;p&gt;（4）使用registerInlinehook进行重定向，将hook函数地址重定向我们编写的新函数上
+(registerInlineHook((uint32_t) strstr_addr, (uint32_t) new_strstr, (uint32_t **) &amp;amp;old_strstr) != ELE7EN_OK
+//参数一：hook函数的地址 参数二：替换函数的地址  参数3：用来保存原来函数的地址&lt;/p&gt;
+&lt;p&gt;（5）我们判断我们的hook操作是否成功,并且再次调用实现hook
+(inlineHook((uint32_t) strstr_addr) == ELE7EN_OK)&lt;/p&gt;
+&lt;p&gt;SandHook使用姿势：&lt;/p&gt;
+&lt;p&gt;（1）导包，将SandHook中cpp文件夹下的包全部导入到项目中，并修改CMakeLists.txt中添加native.cpp, 修改java层导入so库为sandHook-native
+（2）配置相关的环境
+在配置文件build.gradle中配置
+externalNativeBuild {
+cmake {
+arguments &amp;lsquo;-DBUILD_TESTING=OFF&amp;rsquo;
+cppFlags &amp;ldquo;-frtti -fexceptions -Wpointer-arith&amp;rdquo;
+abiFilters &amp;lsquo;armeabi-v7a&amp;rsquo;, &amp;lsquo;arm64-v8a&amp;rsquo;
+}
+}&lt;/p&gt;
+&lt;p&gt;（3）编译可以成功通过
+（4）使用
+const char * libc = &amp;ldquo;/system/lib64/libc.so&amp;rdquo;;
+old_fopen = reinterpret_cast&amp;lt;void &lt;em&gt;(&lt;/em&gt;)(char *, char *)&amp;gt;(SandInlineHookSym(libc, &amp;ldquo;fopen&amp;rdquo;,
+reinterpret_cast&amp;lt;void *&amp;gt;(new_fopen)));
+参数2：hook的函数 参数3：新的函数&lt;/p&gt;
+&lt;p&gt;添加原理hook旧函数的声明
+void* (&lt;em&gt;old_fopen)(char&lt;/em&gt;,char*);
+实现新的函数功能
+void* new_fopen(char* a,char* b){
+__android_log_print(6,&amp;ldquo;windaa&amp;rdquo;,&amp;ldquo;I am from new open %s&amp;rdquo;,a);
+return old_fopen(a,b);
+}&lt;/p&gt;
+&lt;p&gt;（5）运行测试是否成功启动&lt;/p&gt;
+&lt;h5 id=&#34;unicorn-hook&#34;&gt;unicorn hook
+&lt;/h5&gt;&lt;p&gt;​	unidbg&lt;/p&gt;
+&lt;h4 id=&#34;原帖&#34;&gt;原帖
+&lt;/h4&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.52pojie.cn/thread-1823118-1-1.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.52pojie.cn/thread-1823118-1-1.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://bbs.kanxue.com/thread-272870-1.htm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://bbs.kanxue.com/thread-272870-1.htm&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>安卓逆向入门（八）</title>
+        <link>https://zhu1ang.github.io/p/52study_8/</link>
+        <pubDate>Tue, 29 Oct 2024 13:50:05 +0800</pubDate>
+        
+        <guid>https://zhu1ang.github.io/p/52study_8/</guid>
+        <description>&lt;h4 id=&#34;so加载流程&#34;&gt;so加载流程
+&lt;/h4&gt;&lt;p&gt;反调试、脱壳、注入等&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic.rmb.bdstatic.com/bjh/bb663034587188a1fa4ebf55789f66542707.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;涉及到的函数介绍：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;函数名&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;android_dlopen_ext()&lt;/code&gt; 、&lt;code&gt;dlopen()&lt;/code&gt;、&lt;code&gt;do_dlopen()&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;这三个函数主要用于加载库文件。&lt;code&gt;android_dlopen_ext&lt;/code&gt; 是系统的一个函数，用于在运行时动态加载共享库。与标准的 &lt;code&gt;dlopen()&lt;/code&gt; 函数相比，&lt;code&gt;android_dlopen_ext&lt;/code&gt; 提供了更多的参数选项和扩展功能，例如支持命名空间、符号版本等特性。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;find_library()&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;find_library()&lt;/code&gt; 函数用于查找库，基本的用途是给定一个库的名字，然后查找并返回这个库的路径。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;call_constructors()&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;call_constructors()&lt;/code&gt; 是用于调用动态加载库中的构造函数的函数。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;init&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;库的构造函数，用于初始化库中的静态变量或执行其他需要在库被加载时完成的任务。如果没有定义&lt;code&gt;init&lt;/code&gt;函数，系统将不会执行任何动作。需要注意的是，&lt;code&gt;init&lt;/code&gt;函数不应该有任何参数，并且也没有返回值。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;init_array&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;init_array&lt;/code&gt;是ELF（Executable and Linkable Format，可执行和可链接格式）二进制格式中的一个特殊段（section），这个段包含了一些函数的指针，这些函数将在&lt;code&gt;main()&lt;/code&gt;函数执行前被调用，用于初始化静态局部变量和全局变量。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;jni_onload&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;这是Android JNI(Java Native Interface)中的一个函数。当一个native库被系统加载时，该函数会被自动调用。&lt;code&gt;JNI_OnLoad&lt;/code&gt;可以做一些初始化工作，例如注册你的native方法或者初始化一些数据结构。如果你的native库没有定义这个函数，那么JNI会使用默认的行为。&lt;code&gt;JNI_OnLoad&lt;/code&gt;的返回值应该是需要的JNI版本，一般返回&lt;code&gt;JNI_VERSION_1_6&lt;/code&gt;。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;下断点时机：
+应用级别的：java_com_XXX；
+外壳级别的：JNI_Onload，.init，.init_array(反调试);
+系统级别的：fopen，fget，dvmdexfileopen(脱壳)；&lt;/p&gt;
+&lt;h4 id=&#34;ida动态调试&#34;&gt;IDA动态调试
+&lt;/h4&gt;&lt;p&gt;1.前置操作：&lt;/p&gt;
+&lt;p&gt;1.在IDA目录下的dbgsrv，选择跟手机架构一致的server
+2.adb push as /data/local/tmp/
+3.进入手机端命令：adb shell
+4.切换获取手机的root权限：su
+5.跳到对应路径：cd /data/local/tmp/
+6.提权：chmod 777 as
+7.XappDebug hook&lt;/p&gt;
+&lt;p&gt;2.调试步骤&lt;/p&gt;
+&lt;p&gt;分为两种模式，一种是以debug模式启动，第二种则以普通模式启动，二者的区别在于使用场景，有时候要动态调试的参数在app一启动的时候就产生了，时机较早，所以需要以debug模式去挂起app&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bat&#34; data-lang=&#34;bat&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;adb shell am start -D -n com.zj.wuaipojie/.ui.ChallengeEight （去掉-D 则表示不以debug模式启动app）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;adb forward tcp:23946 tcp:23946 (端口转发)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;adb forward tcp:8700 jdwp:PID (pid监听)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700 (jdb挂起)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;3.实例操作&lt;/p&gt;
+&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410311054768.png?x-oss-process=style/zzz&#34; alt=&#34;Screenshot_20241029-031151[1]&#34; style=&#34;zoom:25%;&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410291513268.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241029151346172&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;根据错误提示定位到check函数，把加载的so文件拉出来，使用IDA查看&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410291521452.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241029152152416&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;jint&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;JNI_OnLoad&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;JavaVM&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;vm&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;reserved&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kr&#34;&gt;__int64&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;v4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// x0
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;_QWORD&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;v5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// [xsp+0h] [xbp-30h] BYREF
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;v5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_QWORD&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;_ReadStatusReg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;ARM64_SYSREG&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;40&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;ptrace&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;PTRACE_TRACEME&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0LL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1LL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0LL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;_exit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;__android_log_print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;NativeHookIO&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;i am JNI_OnLoad&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;v5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0LL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;vm&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;GetEnv&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;vm&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;**&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;65542LL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;v4&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;__int64&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;__fastcall&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;**&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_QWORD&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_QWORD&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;48LL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;         &lt;span class=&#34;n&#34;&gt;v5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;         &lt;span class=&#34;s&#34;&gt;&amp;#34;com/zj/wuaipojie/util/SecurityUtil&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v4&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;__fastcall&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;**&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_QWORD&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;__int64&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;**&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;__int64&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_QWORD&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1720LL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;v4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;methods&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1LL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;65542&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;JNI_OnLoad方法里面可能会有反调试的函数，将强制跳转到校验处patch为NOP，忽略校验。&lt;/p&gt;
+&lt;p&gt;然后使用更新后的so文件替换掉apk中原来的so，开始调试&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410311044284.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241031104443155&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;注：使用IDA 9 Pro 的android_server64的话会一直报错&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410311050746.png?x-oss-process=style/zzz&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241031105051702&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;运行到断点的时候，再单步运行到比较这里，就可以得到正确密码&lt;/p&gt;
+&lt;img src=&#34;https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202410311054317.png?x-oss-process=style/zzz&#34; alt=&#34;Screenshot_20241030-225224[1]&#34; style=&#34;zoom:25%;&#34; /&gt;
+&lt;h4 id=&#34;so防护手段之ollvm&#34;&gt;so防护手段之ollvm
+&lt;/h4&gt;&lt;p&gt;常见防护手段:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;主要功能&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;SO加壳&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;对C/C++源码编译出来的SO文件进行加壳，使SO文件无法正确反编译和反汇编。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;SO源码虚拟化保护&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;将原始汇编指令翻译为自定义的虚拟机指令，跳转到自定义的虚拟机中执行，每次保护生成的虚拟机指令随机，且对虚拟机解释器再度混淆&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;SO防调用&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;对SO文件进行授权绑定，防止SO文件被非授权应用调用运行。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;SO Linker&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;对整个SO文件进行加密压缩，包括代码段、符号表和字符串等，运行时再解密解压缩到内存，从而有效的防止SO数据的泄露。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;SO源码混淆&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;常量字符串加密、分裂基本块、等价指令替换、虚假控制流、控制流平坦化。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;SO环境监测&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;防frida\xposed\root、防动态调试、防模拟器、防多开等&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;ollvm的分类：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;分类&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;指令替换（Instructions Substitution)(Sub)&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;将一条运算指令替换为多条等价的运算指令，例如：y=x+1变为y=x+1+1-1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;虚假控制流（Bogus Control Flow)(bcf)&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;通过加入包含不透明谓词的条件跳转和不可达的基本块，来干扰IDA的控制流分析和F5反汇编&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;控制流平坦化(Control Flow Flattening)(Fla)&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;主要通过一个主分发器来控制程序基本块的执行流程，将所有基本代码放到控制流最底部，然后删除原理基本块之间跳转关系，添加次分发器来控制分发逻辑，然后过新的复杂分发逻辑还原原来程序块之间的逻辑关系&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;字符串加密&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;编写一个pass将其中的字符串信息使用一些加密算法进行加密，然后特定的时间进行还原&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;ollvm的对抗：&lt;/p&gt;
+&lt;p&gt;1.简单ollvm可以通过交叉引用分析
+2.angr去除不透明谓词
+3.Unicorn/Unidbg/AndroidNativeEmu模拟执行
+4.IDA Trace
+5.binary ninja
+6.后端编译优化
+7.frida辅助分析&lt;/p&gt;
+&lt;h4 id=&#34;原帖&#34;&gt;原帖
+&lt;/h4&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.52pojie.cn/thread-1809646-1-1.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.52pojie.cn/thread-1809646-1-1.html&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>安卓逆向入门（七）</title>
         <link>https://zhu1ang.github.io/p/52study_7/</link>
         <pubDate>Thu, 24 Oct 2024 10:14:13 +0800</pubDate>
