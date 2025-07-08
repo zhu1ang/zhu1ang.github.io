@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Activity\r基本介绍\rActivity 是 Android 四大组件中最基本也是最常用的组件之一，它通常代表着一个带有用户界面的单一屏幕。用户在应用中看到的每一个界面，几乎都是一个 Activity。 创建的Activity需要： 继承Android的Activity类 在AndroidManifest.xml中注册 生命周期\rActivity的生命周期回调方法按顺序主要包括： onCreate(): 必须实现此方法。在系统首次创建 Activity 时调用。在这里进行所有的静态设置，比如创建视图（setContentView()）、绑定数据等。此方法接收一个 Bundle 对象，其中包含 Activity 先前保存的状态（如果存在）。 onStart(): 当 Activity 对用户可见时调用。 onResume(): 当 Activity 进入前台并开始与用户交互时调用。Activity 此时位于任务栈（Task Stack）的顶部。 onPause(): 当系统即将启动另一个 Activity 时调用。此方法通常用于提交未保存的更改、停止动画或其他消耗 CPU 的操作。此方法的执行速度必须非常快。 onStop(): 当 Activity 对用户不再可见时调用。这可能是因为一个新的 Activity 启动了、一个现有的 Activity 被带到前台，或者该 Activity 即将被销毁。 onDestroy(): 在 Activity 被销毁前调用。这可能是因为用户完全关闭了 Activity，或者系统为了节省空间而临时销毁它。 onRestart(): 当一个已经停止的 Activity 准备再次启动时调用。 启动与跳转\rActivity 之间的跳转是通过 Intent (意图) 对象来完成的。Intent 是一个消息传递对象，你可以用它来向其他应用组件请求操作。 启动方式: 显式 Intent (Explicit Intent): 明确指定要启动的组件的类名。这通常用于应用内部的导航。 1 2 3 4 // 从当前的 Activity 跳转到 DetailActivity // ::class.">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第一行代码学习笔记">
 <title>第一行代码（3）</title>
 
 <link rel='canonical' href='https://zhu1ang.github.io/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%813/'>
 
 <link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="第一行代码（3）">
-<meta property='og:description' content="Activity\r基本介绍\rActivity 是 Android 四大组件中最基本也是最常用的组件之一，它通常代表着一个带有用户界面的单一屏幕。用户在应用中看到的每一个界面，几乎都是一个 Activity。 创建的Activity需要： 继承Android的Activity类 在AndroidManifest.xml中注册 生命周期\rActivity的生命周期回调方法按顺序主要包括： onCreate(): 必须实现此方法。在系统首次创建 Activity 时调用。在这里进行所有的静态设置，比如创建视图（setContentView()）、绑定数据等。此方法接收一个 Bundle 对象，其中包含 Activity 先前保存的状态（如果存在）。 onStart(): 当 Activity 对用户可见时调用。 onResume(): 当 Activity 进入前台并开始与用户交互时调用。Activity 此时位于任务栈（Task Stack）的顶部。 onPause(): 当系统即将启动另一个 Activity 时调用。此方法通常用于提交未保存的更改、停止动画或其他消耗 CPU 的操作。此方法的执行速度必须非常快。 onStop(): 当 Activity 对用户不再可见时调用。这可能是因为一个新的 Activity 启动了、一个现有的 Activity 被带到前台，或者该 Activity 即将被销毁。 onDestroy(): 在 Activity 被销毁前调用。这可能是因为用户完全关闭了 Activity，或者系统为了节省空间而临时销毁它。 onRestart(): 当一个已经停止的 Activity 准备再次启动时调用。 启动与跳转\rActivity 之间的跳转是通过 Intent (意图) 对象来完成的。Intent 是一个消息传递对象，你可以用它来向其他应用组件请求操作。 启动方式: 显式 Intent (Explicit Intent): 明确指定要启动的组件的类名。这通常用于应用内部的导航。 1 2 3 4 // 从当前的 Activity 跳转到 DetailActivity // ::class.">
+<meta property='og:description' content="第一行代码学习笔记">
 <meta property='og:url' content='https://zhu1ang.github.io/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%813/'>
 <meta property='og:site_name' content='剑饮雪'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='学习笔记' /><meta property='article:tag' content='安卓开发' /><meta property='article:published_time' content='2025-07-08T10:04:26&#43;08:00'/><meta property='article:modified_time' content='2025-07-08T10:04:26&#43;08:00'/>
 <meta name="twitter:title" content="第一行代码（3）">
-<meta name="twitter:description" content="Activity\r基本介绍\rActivity 是 Android 四大组件中最基本也是最常用的组件之一，它通常代表着一个带有用户界面的单一屏幕。用户在应用中看到的每一个界面，几乎都是一个 Activity。 创建的Activity需要： 继承Android的Activity类 在AndroidManifest.xml中注册 生命周期\rActivity的生命周期回调方法按顺序主要包括： onCreate(): 必须实现此方法。在系统首次创建 Activity 时调用。在这里进行所有的静态设置，比如创建视图（setContentView()）、绑定数据等。此方法接收一个 Bundle 对象，其中包含 Activity 先前保存的状态（如果存在）。 onStart(): 当 Activity 对用户可见时调用。 onResume(): 当 Activity 进入前台并开始与用户交互时调用。Activity 此时位于任务栈（Task Stack）的顶部。 onPause(): 当系统即将启动另一个 Activity 时调用。此方法通常用于提交未保存的更改、停止动画或其他消耗 CPU 的操作。此方法的执行速度必须非常快。 onStop(): 当 Activity 对用户不再可见时调用。这可能是因为一个新的 Activity 启动了、一个现有的 Activity 被带到前台，或者该 Activity 即将被销毁。 onDestroy(): 在 Activity 被销毁前调用。这可能是因为用户完全关闭了 Activity，或者系统为了节省空间而临时销毁它。 onRestart(): 当一个已经停止的 Activity 准备再次启动时调用。 启动与跳转\rActivity 之间的跳转是通过 Intent (意图) 对象来完成的。Intent 是一个消息传递对象，你可以用它来向其他应用组件请求操作。 启动方式: 显式 Intent (Explicit Intent): 明确指定要启动的组件的类名。这通常用于应用内部的导航。 1 2 3 4 // 从当前的 Activity 跳转到 DetailActivity // ::class.">
+<meta name="twitter:description" content="第一行代码学习笔记">
     <link rel="shortcut icon" href="/static/images/favicon.ico" />
 
   
@@ -291,6 +291,10 @@
             <a href="/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%813/">第一行代码（3）</a>
         </h2>
     
+        
+        <h3 class="article-subtitle">
+            第一行代码学习笔记
+        </h3>
         
     </div>
 
