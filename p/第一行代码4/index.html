@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Android UI\r常用控件\rTextView，显示一行文字，可以指定text的大小、颜色、位置等 1 2 3 4 &lt;TextView android:layout_width=&#34;wrap_content&#34; android:layout_height=&#34;wrap_content&#34; android:text=&#34;Hello World!&#34; /&gt; Button，设置一个按钮，注册点击事件 1 2 3 4 5 6 7 8 9 10 &lt;Button android:id=&#34;@+id/button&#34; android:layout_width=&#34;match_parent&#34; android:layout_height=&#34;wrap_content&#34; android:layout_marginTop=&#34;16dp&#34; android:gravity=&#34;center&#34; android:text=&#34;button&#34; app:layout_constraintEnd_toEndOf=&#34;parent&#34; app:layout_constraintStart_toStartOf=&#34;parent&#34; app:layout_constraintTop_toBottomOf=&#34;@+id/edittext&#34; /&gt; 1 2 3 4 5 6 7 8 9 private lateinit var binding : ActivityMainBinding override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState) binding = ActivityMainBinding.inflate(layoutInflater) setContentView(binding.root) binding.button.setOnClickListener { ... } } EditText，用户的输入编辑框 1 2 3 4 5 6 7 8 9 10 &lt;EditText android:id=&#34;@+id/edittext&#34; android:layout_width=&#34;match_parent&#34; android:layout_height=&#34;wrap_content&#34; android:layout_marginTop=&#34;32dp&#34; android:hint=&#34;请输入&#34; android:maxLines=&#34;2&#34; app:layout_constraintEnd_toEndOf=&#34;parent&#34; app:layout_constraintStart_toStartOf=&#34;parent&#34; app:layout_constraintTop_toTopOf=&#34;parent&#34; /&gt; ImageView，展示图片,不要忘了图片资源都要放到drawable文件夹下">
+<title>第一行代码（4）</title>
+
+<link rel='canonical' href='https://zhu1ang.github.io/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%814/'>
+
+<link rel="stylesheet" href="/scss/style.min.216e53d7a01afaa5919cc32112b77387d0d40b4fe7914c1ed88f339eb8b79fb5.css"><meta property='og:title' content="第一行代码（4）">
+<meta property='og:description' content="Android UI\r常用控件\rTextView，显示一行文字，可以指定text的大小、颜色、位置等 1 2 3 4 &lt;TextView android:layout_width=&#34;wrap_content&#34; android:layout_height=&#34;wrap_content&#34; android:text=&#34;Hello World!&#34; /&gt; Button，设置一个按钮，注册点击事件 1 2 3 4 5 6 7 8 9 10 &lt;Button android:id=&#34;@+id/button&#34; android:layout_width=&#34;match_parent&#34; android:layout_height=&#34;wrap_content&#34; android:layout_marginTop=&#34;16dp&#34; android:gravity=&#34;center&#34; android:text=&#34;button&#34; app:layout_constraintEnd_toEndOf=&#34;parent&#34; app:layout_constraintStart_toStartOf=&#34;parent&#34; app:layout_constraintTop_toBottomOf=&#34;@+id/edittext&#34; /&gt; 1 2 3 4 5 6 7 8 9 private lateinit var binding : ActivityMainBinding override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState) binding = ActivityMainBinding.inflate(layoutInflater) setContentView(binding.root) binding.button.setOnClickListener { ... } } EditText，用户的输入编辑框 1 2 3 4 5 6 7 8 9 10 &lt;EditText android:id=&#34;@+id/edittext&#34; android:layout_width=&#34;match_parent&#34; android:layout_height=&#34;wrap_content&#34; android:layout_marginTop=&#34;32dp&#34; android:hint=&#34;请输入&#34; android:maxLines=&#34;2&#34; app:layout_constraintEnd_toEndOf=&#34;parent&#34; app:layout_constraintStart_toStartOf=&#34;parent&#34; app:layout_constraintTop_toTopOf=&#34;parent&#34; /&gt; ImageView，展示图片,不要忘了图片资源都要放到drawable文件夹下">
+<meta property='og:url' content='https://zhu1ang.github.io/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%814/'>
+<meta property='og:site_name' content='剑饮雪'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='学习笔记' /><meta property='article:tag' content='安卓开发' /><meta property='article:published_time' content='2025-07-09T15:17:47&#43;08:00'/><meta property='article:modified_time' content='2025-07-09T15:17:47&#43;08:00'/>
+<meta name="twitter:title" content="第一行代码（4）">
+<meta name="twitter:description" content="Android UI\r常用控件\rTextView，显示一行文字，可以指定text的大小、颜色、位置等 1 2 3 4 &lt;TextView android:layout_width=&#34;wrap_content&#34; android:layout_height=&#34;wrap_content&#34; android:text=&#34;Hello World!&#34; /&gt; Button，设置一个按钮，注册点击事件 1 2 3 4 5 6 7 8 9 10 &lt;Button android:id=&#34;@+id/button&#34; android:layout_width=&#34;match_parent&#34; android:layout_height=&#34;wrap_content&#34; android:layout_marginTop=&#34;16dp&#34; android:gravity=&#34;center&#34; android:text=&#34;button&#34; app:layout_constraintEnd_toEndOf=&#34;parent&#34; app:layout_constraintStart_toStartOf=&#34;parent&#34; app:layout_constraintTop_toBottomOf=&#34;@+id/edittext&#34; /&gt; 1 2 3 4 5 6 7 8 9 private lateinit var binding : ActivityMainBinding override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState) binding = ActivityMainBinding.inflate(layoutInflater) setContentView(binding.root) binding.button.setOnClickListener { ... } } EditText，用户的输入编辑框 1 2 3 4 5 6 7 8 9 10 &lt;EditText android:id=&#34;@+id/edittext&#34; android:layout_width=&#34;match_parent&#34; android:layout_height=&#34;wrap_content&#34; android:layout_marginTop=&#34;32dp&#34; android:hint=&#34;请输入&#34; android:maxLines=&#34;2&#34; app:layout_constraintEnd_toEndOf=&#34;parent&#34; app:layout_constraintStart_toStartOf=&#34;parent&#34; app:layout_constraintTop_toTopOf=&#34;parent&#34; /&gt; ImageView，展示图片,不要忘了图片资源都要放到drawable文件夹下">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Ukenn2112/UkennWeb@3.0/index/web.js"></script>
+        <div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ico_hu627d1395d31b147b1726fc8be242e34e_39784_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">剑饮雪</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/zhu1ang'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#android-ui">Android UI</a></li>
+            <li><a href="#kotlin补充">Kotlin补充</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AE%89%E5%8D%93%E5%BC%80%E5%8F%91/" >
+                安卓开发
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%814/">第一行代码（4）</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 09, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h4 id="android-ui">Android UI
+</h4><h5 id="常用控件">常用控件
+</h5><p><strong>TextView</strong>，显示一行文字，可以指定text的大小、颜色、位置等</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;TextView</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Hello World!&#34;</span> <span class="nt">/&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Button</strong>，设置一个按钮，注册点击事件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_marginTop=</span><span class="s">&#34;16dp&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:gravity=</span><span class="s">&#34;center&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;button&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">app:layout_constraintEnd_toEndOf=</span><span class="s">&#34;parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">app:layout_constraintStart_toStartOf=</span><span class="s">&#34;parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">app:layout_constraintTop_toBottomOf=</span><span class="s">&#34;@+id/edittext&#34;</span> <span class="nt">/&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">private</span>  <span class="k">lateinit</span> <span class="k">var</span> <span class="py">binding</span> <span class="p">:</span> <span class="n">ActivityMainBinding</span>
+</span></span><span class="line"><span class="cl"><span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">:</span> <span class="n">Bundle</span><span class="p">?)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">super</span><span class="p">.</span><span class="n">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">binding</span> <span class="p">=</span> <span class="nc">ActivityMainBinding</span><span class="p">.</span><span class="n">inflate</span><span class="p">(</span><span class="n">layoutInflater</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">setContentView</span><span class="p">(</span><span class="n">binding</span><span class="p">.</span><span class="n">root</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">binding</span><span class="p">.</span><span class="n">button</span><span class="p">.</span><span class="n">setOnClickListener</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="o">..</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>EditText</strong>，用户的输入编辑框</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"> <span class="nt">&lt;EditText</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/edittext&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_marginTop=</span><span class="s">&#34;32dp&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:hint=</span><span class="s">&#34;请输入&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:maxLines=</span><span class="s">&#34;2&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">app:layout_constraintEnd_toEndOf=</span><span class="s">&#34;parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">app:layout_constraintStart_toStartOf=</span><span class="s">&#34;parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">app:layout_constraintTop_toTopOf=</span><span class="s">&#34;parent&#34;</span> <span class="nt">/&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>ImageView</strong>，展示图片,不要忘了图片资源都要放到drawable文件夹下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;ImageView</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/image&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:src =</span> <span class="s">&#34;@drawable/pupian&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">tools:ignore=</span><span class="s">&#34;MissingConstraints&#34;</span> <span class="nt">/&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>ProgressBar</strong>，进度条</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"> <span class="nt">&lt;ProgressBar</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/progressButton&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">style=</span><span class="s">&#34;@style/Widget.AppCompat.ProgressBar.Horizontal&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:max=</span><span class="s">&#34;100&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">tools:ignore=</span><span class="s">&#34;MissingConstraints&#34;</span> <span class="nt">/&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>设置一个水平并且最大为100的进度条</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="n">binding</span><span class="p">.</span><span class="n">button</span><span class="p">.</span><span class="n">setOnClickListener</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//            val inputtext = binding.edittext.text.toString()
+</span></span></span><span class="line"><span class="cl"><span class="c1">//            Toast.makeText(this , inputtext , Toast.LENGTH_SHORT).show()
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">var</span> <span class="py">currentProgressBar</span> <span class="p">=</span> <span class="n">binding</span><span class="p">.</span><span class="n">progressButton</span><span class="p">.</span><span class="n">progress</span>
+</span></span><span class="line"><span class="cl">            <span class="n">binding</span><span class="p">.</span><span class="n">progressButton</span><span class="p">.</span><span class="n">progress</span> <span class="p">=</span> <span class="n">currentProgressBar</span> <span class="p">+</span> <span class="m">10</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>绑定到按钮的点击事件，实现点击按钮进度条增加10分之一</p>
+<p><strong>AlertDialog</strong>，可以在当前界面弹出一个对话框，这个对话框是置顶于所有界面元素之上的，能够屏蔽其他控件的交互能力，因此AlertDialog一般用于提示一些非常重要的内容或者警告信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="nc">AlertDialog</span><span class="p">.</span><span class="n">Builder</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">apply</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">setTitle</span><span class="p">(</span><span class="s2">&#34;This is a Dialog&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">setMessage</span><span class="p">(</span><span class="s2">&#34;Something Wrong&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">setCancelable</span><span class="p">(</span><span class="k">false</span><span class="p">)</span><span class="c1">//必须点击才能关闭dialog
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    			<span class="c1">//点击按钮执行which后操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                <span class="n">setPositiveButton</span><span class="p">(</span><span class="s2">&#34;OK&#34;</span><span class="p">){</span><span class="n">dialog</span> <span class="p">,</span> <span class="n">which</span> <span class="o">-&gt;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="n">setNegativeButton</span><span class="p">(</span><span class="s2">&#34;Cancle&#34;</span><span class="p">){</span><span class="n">dialog</span> <span class="p">,</span> <span class="n">which</span><span class="o">-&gt;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="n">show</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h5 id="基本布局">基本布局
+</h5><p>布局是一种容器，可以调整内部控件的位置，实现UI的设计。布局和控件的关系大致：</p>
+<img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202507101345958.png?x-oss-process=style/zzz" alt="image-20250710134508828" style="zoom:67%;" />
+<h6 id="linearlayout">LinearLayout
+</h6><p>线性布局，内部的控件在线性方向依次排列，<code>android:orientation</code>属性来指定是垂直排列（vertical）还是水平排列（horizontal），<code>android:layout_gravity</code>属性来指定布局内部控件相对布局的位置。</p>
+<p><code>android:layout_weight</code>属性允许使用比例的方式来指定控件的大小</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;EditText</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:id=</span><span class="s">&#34;@+id/input_message&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_width=</span><span class="s">&#34;0dp&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_weight=</span><span class="s">&#34;1&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:hint=</span><span class="s">&#34;Type something&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:id=</span><span class="s">&#34;@+id/send&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_width=</span><span class="s">&#34;0dp&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_weight=</span><span class="s">&#34;1&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:text=</span><span class="s">&#34;Send&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">/&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里按照每个控件<code>layout_weight</code>值占总<code>layout_weight</code>值的比例来分配控件比例大小。</p>
+<h6 id="relativelayout">RelativeLayout
+</h6><p>相对布局，通过这种方式让控件在布局的任何位置，属性相对更多</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;RelativeLayout</span> <span class="na">xmlns:android=</span><span class="s">&#34;http://schemas.android.com/apk/res/android&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_width=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_height=</span><span class="s">&#34;match_parent&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button1&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_alignParentLeft=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_alignParentTop=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 1&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button2&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_alignParentRight=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_alignParentTop=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 2&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_centerInParent=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 3&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button4&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_alignParentBottom=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_alignParentLeft=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 4&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button5&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_alignParentBottom=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_alignParentRight=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 5&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/RelativeLayout&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>实现的效果：</p>
+<img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202507101400358.png?x-oss-process=style/zzz" alt="image-20250710140056304" style="zoom:50%;" />
+<p>RelativeLayout也支持控件之间相对位置来指定</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;RelativeLayout</span> <span class="na">xmlns:android=</span><span class="s">&#34;http://schemas.android.com/apk/res/android&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_width=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_height=</span><span class="s">&#34;match_parent&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_centerInParent=</span><span class="s">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 3&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button1&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_above=</span><span class="s">&#34;@id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_toLeftOf=</span><span class="s">&#34;@id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 1&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button2&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_above=</span><span class="s">&#34;@id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_toRightOf=</span><span class="s">&#34;@id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 2&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button4&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_below=</span><span class="s">&#34;@id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_toLeftOf=</span><span class="s">&#34;@id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 4&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/button5&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_below=</span><span class="s">&#34;@id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_toRightOf=</span><span class="s">&#34;@id/button3&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:text=</span><span class="s">&#34;Button 5&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/RelativeLayout&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><img src="https://pic-one1.oss-cn-beijing.aliyuncs.com/typroa/202507101403882.png?x-oss-process=style/zzz" alt="image-20250710140326734" style="zoom:50%;" />
+<p>另外<code>android:layout_alignLeft</code>等属性指定控件之间左边缘对其，其他位置类似。</p>
+<h6 id="framelayout">FrameLayout
+</h6><p>帧布局，控件默认位于布局的左上角，没有什么很特殊的地方</p>
+<h6 id="自定义控件">自定义控件
+</h6><p>自定义view的步骤大致如下：</p>
+<ul>
+<li>创建自定义类，继承view类或者其子类</li>
+<li>实现构造函数，通常需要处理 <code>(Context)</code> 和 <code>(Context, AttributeSet?)</code> 这两个版本，以便在代码中创建和在 XML 中使用。使用 <code>@JvmOverloads</code> 注解可以极大简化这一步。</li>
+<li>（可选）定义自定的属性并在自定义类中获取使用这些属性</li>
+<li>重写<code>onMeasure()</code>，用来测量view的大小，最后必须调用 <code>setMeasuredDimension(width, height)</code> 来保存测量结果。</li>
+<li>重写 <code>onDraw()</code><strong>，这是自定义 View 的</strong>绘制核心。系统会传递给你一个 <code>Canvas</code>（画布）对象，你可以在这个画布上使用 <code>Paint</code>（画笔）来绘制任何你想要的形状、文字、图片等。</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="cp">&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;resources&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;declare-styleable</span> <span class="na">name=</span><span class="s">&#34;CustomCircleView&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;attr</span> <span class="na">name=</span><span class="s">&#34;circle_color&#34;</span> <span class="na">format=</span><span class="s">&#34;color&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/declare-styleable&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/resources&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.content.Context</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.graphics.Canvas</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.graphics.Color</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.graphics.Paint</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.util.AttributeSet</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.view.View</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">com.example.yourapp.R</span> <span class="c1">// 确保导入你项目的 R 类
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * 1. 创建类并继承自 View
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * 2. 使用 @JvmOverloads 简化构造函数
+</span></span></span><span class="line"><span class="cl"><span class="cm"> */</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CustomCircleView</span> <span class="nd">@JvmOverloads</span> <span class="k">constructor</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">attrs</span><span class="p">:</span> <span class="n">AttributeSet</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">defStyleAttr</span><span class="p">:</span> <span class="n">Int</span> <span class="p">=</span> <span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="p">:</span> <span class="n">View</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">defStyleAttr</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 初始化画笔，开启抗锯齿
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">private</span> <span class="k">val</span> <span class="py">paint</span> <span class="p">=</span> <span class="n">Paint</span><span class="p">(</span><span class="nc">Paint</span><span class="p">.</span><span class="n">ANTI_ALIAS_FLAG</span><span class="p">).</span><span class="n">apply</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">style</span> <span class="p">=</span> <span class="nc">Paint</span><span class="p">.</span><span class="nc">Style</span><span class="p">.</span><span class="n">FILL</span> <span class="c1">// 设置为填充模式
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 圆的半径
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">private</span> <span class="k">var</span> <span class="py">radius</span> <span class="p">=</span> <span class="m">0f</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">init</span> <span class="p">{</span> <span class="c1">// 4. 在初始化代码块中获取自定义属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">attrs</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 获取在 attrs.xml 中定义的属性数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">val</span> <span class="py">typedArray</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">obtainStyledAttributes</span><span class="p">(</span><span class="k">it</span><span class="p">,</span> <span class="nc">R</span><span class="p">.</span><span class="n">styleable</span><span class="p">.</span><span class="n">CustomCircleView</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="c1">// 读取 circle_color 属性值，如果XML中未指定，则默认为红色
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">val</span> <span class="py">circleColor</span> <span class="p">=</span> <span class="n">typedArray</span><span class="p">.</span><span class="n">getColor</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">styleable</span><span class="p">.</span><span class="n">CustomCircleView_circle_color</span><span class="p">,</span> <span class="nc">Color</span><span class="p">.</span><span class="n">RED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">paint</span><span class="p">.</span><span class="n">color</span> <span class="p">=</span> <span class="n">circleColor</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">// **非常重要：回收 typedArray**
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">typedArray</span><span class="p">.</span><span class="n">recycle</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * 5. 重写 onMeasure() 来测量 View 大小
+</span></span></span><span class="line"><span class="cl"><span class="cm">     */</span>
+</span></span><span class="line"><span class="cl">    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onMeasure</span><span class="p">(</span><span class="n">widthMeasureSpec</span><span class="p">:</span> <span class="n">Int</span><span class="p">,</span> <span class="n">heightMeasureSpec</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">super</span><span class="p">.</span><span class="n">onMeasure</span><span class="p">(</span><span class="n">widthMeasureSpec</span><span class="p">,</span> <span class="n">heightMeasureSpec</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 取测量出的宽高中的较小值，以确保能画出一个完整的圆
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">val</span> <span class="py">size</span> <span class="p">=</span> <span class="n">minOf</span><span class="p">(</span><span class="n">measuredWidth</span><span class="p">,</span> <span class="n">measuredHeight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 计算半径
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">radius</span> <span class="p">=</span> <span class="n">size</span> <span class="p">/</span> <span class="m">2f</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 设置最终的尺寸，确保 View 是正方形
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">setMeasuredDimension</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * 6. 重写 onDraw() 来绘制
+</span></span></span><span class="line"><span class="cl"><span class="cm">     */</span>
+</span></span><span class="line"><span class="cl">    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onDraw</span><span class="p">(</span><span class="n">canvas</span><span class="p">:</span> <span class="n">Canvas</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">super</span><span class="p">.</span><span class="n">onDraw</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 在 View 的中心绘制圆形
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// (width / 2f) 和 (height / 2f) 是圆心坐标
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">canvas</span><span class="p">.</span><span class="n">drawCircle</span><span class="p">(</span><span class="n">width</span> <span class="p">/</span> <span class="m">2f</span><span class="p">,</span> <span class="n">height</span> <span class="p">/</span> <span class="m">2f</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">paint</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后即可在布局文件中使用自定的控件了，注意包名必须是完整的。</p>
+<h6 id="recycleview">RecycleView
+</h6><ol>
+<li>需要在构建脚本中添加recycleview的依赖</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="c1">// 在 dependencies { ... } 代码块中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">implementation</span><span class="p">(</span><span class="s2">&#34;androidx.recyclerview:recyclerview:1.3.2&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>创建列表项的布局文件，为列表中的每一项创建一个布局文件</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="cp">&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;LinearLayout</span>
+</span></span><span class="line"><span class="cl">    <span class="na">xmlns:android=</span><span class="s">&#34;http://schemas.android.com/apk/res/android&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_width=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:padding=</span><span class="s">&#34;16dp&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;TextView</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/item_textview&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;wrap_content&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:textSize=</span><span class="s">&#34;18sp&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:textColor=</span><span class="s">&#34;@android:color/black&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/LinearLayout&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>主布局中添加recycleview依赖‘</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="cp">&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;androidx.constraintlayout.widget.ConstraintLayout</span>
+</span></span><span class="line"><span class="cl">    <span class="na">xmlns:android=</span><span class="s">&#34;http://schemas.android.com/apk/res/android&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">xmlns:app=</span><span class="s">&#34;http://schemas.android.com/apk/res-auto&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">xmlns:tools=</span><span class="s">&#34;http://schemas.android.com/tools&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_width=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">android:layout_height=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">tools:context=</span><span class="s">&#34;.MainActivity&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;androidx.recyclerview.widget.RecyclerView</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:id=</span><span class="s">&#34;@+id/recycler_view&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_width=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">android:layout_height=</span><span class="s">&#34;match_parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">app:layout_constraintTop_toTopOf=</span><span class="s">&#34;parent&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">app:layout_constraintBottom_toBottomOf=</span><span class="s">&#34;parent&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="4">
+<li>创建数据适配器（Adapter）</li>
+</ol>
+<p>这是recycleview的核心。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.view.LayoutInflater</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.view.View</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.view.ViewGroup</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.widget.TextView</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.recyclerview.widget.RecyclerView</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 1. Adapter类，接收一个数据列表作为参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">MyAdapter</span><span class="p">(</span><span class="k">private</span> <span class="k">val</span> <span class="py">dataSet</span><span class="p">:</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">String</span><span class="p">&gt;)</span> <span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nc">RecyclerView</span><span class="p">.</span><span class="n">Adapter</span><span class="p">&lt;</span><span class="nc">MyAdapter</span><span class="p">.</span><span class="n">MyViewHolder</span><span class="p">&gt;()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 2. ViewHolder类，持有列表项的视图引用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">class</span> <span class="nc">MyViewHolder</span><span class="p">(</span><span class="n">view</span><span class="p">:</span> <span class="n">View</span><span class="p">)</span> <span class="p">:</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="n">ViewHolder</span><span class="p">(</span><span class="n">view</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">val</span> <span class="py">textView</span><span class="p">:</span> <span class="n">TextView</span> <span class="p">=</span> <span class="n">view</span><span class="p">.</span><span class="n">findViewById</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">id</span><span class="p">.</span><span class="n">item_textview</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 3. 创建新的 ViewHolder (当 RecyclerView 需要一个新的列表项视图时调用)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreateViewHolder</span><span class="p">(</span><span class="n">parent</span><span class="p">:</span> <span class="n">ViewGroup</span><span class="p">,</span> <span class="n">viewType</span><span class="p">:</span> <span class="n">Int</span><span class="p">):</span> <span class="n">MyViewHolder</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 加载 list_item.xml 布局文件
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">val</span> <span class="py">view</span> <span class="p">=</span> <span class="nc">LayoutInflater</span><span class="p">.</span><span class="n">from</span><span class="p">(</span><span class="n">parent</span><span class="p">.</span><span class="n">context</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">inflate</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">list_item</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="k">false</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">MyViewHolder</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 4. 将数据绑定到 ViewHolder (当 RecyclerView 需要显示特定位置的数据时调用)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onBindViewHolder</span><span class="p">(</span><span class="n">holder</span><span class="p">:</span> <span class="n">MyViewHolder</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 从数据集中获取对应位置的数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">val</span> <span class="py">itemText</span> <span class="p">=</span> <span class="n">dataSet</span><span class="p">[</span><span class="n">position</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 将数据设置到 ViewHolder 的 TextView 上
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">holder</span><span class="p">.</span><span class="n">textView</span><span class="p">.</span><span class="n">text</span> <span class="p">=</span> <span class="n">itemText</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 5. 返回数据集的大小 (告诉 RecyclerView 总共有多少个列表项)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getItemCount</span><span class="p">():</span> <span class="n">Int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">dataSet</span><span class="p">.</span><span class="n">size</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="5">
+<li>在MainActivity中设置RecycleView</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.appcompat.app.AppCompatActivity</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.os.Bundle</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.recyclerview.widget.LinearLayoutManager</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.recyclerview.widget.RecyclerView</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MainActivity</span> <span class="p">:</span> <span class="n">AppCompatActivity</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">:</span> <span class="n">Bundle</span><span class="p">?)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">super</span><span class="p">.</span><span class="n">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">setContentView</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">activity_main</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 1. 准备数据源
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">val</span> <span class="py">sampleData</span> <span class="p">=</span> <span class="n">List</span><span class="p">(</span><span class="m">50</span><span class="p">)</span> <span class="p">{</span> <span class="n">index</span> <span class="o">-&gt;</span> <span class="s2">&#34;这是第 </span><span class="si">${index + 1}</span><span class="s2"> 项&#34;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 2. 找到 RecyclerView 控件
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">val</span> <span class="py">recyclerView</span><span class="p">:</span> <span class="n">RecyclerView</span> <span class="p">=</span> <span class="n">findViewById</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">id</span><span class="p">.</span><span class="n">recycler_view</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 3. 设置布局管理器 (LayoutManager)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// LinearLayoutManager 用于创建标准的垂直或水平列表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">recyclerView</span><span class="p">.</span><span class="n">layoutManager</span> <span class="p">=</span> <span class="n">LinearLayoutManager</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 4. 创建并设置适配器 (Adapter)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">val</span> <span class="py">adapter</span> <span class="p">=</span> <span class="n">MyAdapter</span><span class="p">(</span><span class="n">sampleData</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">recyclerView</span><span class="p">.</span><span class="n">adapter</span> <span class="p">=</span> <span class="n">adapter</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>RecycleView实现横向滚动和瀑布流布局可以通过更换LayoutManager而几乎不用修改Adapter代码就能实现。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.recyclerview.widget.LinearLayoutManager</span> <span class="c1">// 确保导入正确
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">import</span> <span class="nn">androidx.recyclerview.widget.RecyclerView</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// ... in MainActivity&#39;s onCreate method
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ... 找到 recyclerView 之后
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 设置布局管理器 (LayoutManager) 为横向
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">recyclerView</span><span class="p">.</span><span class="n">layoutManager</span> <span class="p">=</span> <span class="n">LinearLayoutManager</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nc">LinearLayoutManager</span><span class="p">.</span><span class="n">HORIZONTAL</span><span class="p">,</span> <span class="k">false</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//即可实现横向滚动
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.recyclerview.widget.RecyclerView</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.recyclerview.widget.StaggeredGridLayoutManager</span> <span class="c1">// 导入 StaggeredGridLayoutManager
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ... in MainActivity&#39;s onCreate method
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ... 找到 recyclerView 之后
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 设置布局管理器 (LayoutManager) 为瀑布流
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 2 表示列数，VERTICAL 表示垂直滚动
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">recyclerView</span><span class="p">.</span><span class="n">layoutManager</span> <span class="p">=</span> <span class="n">StaggeredGridLayoutManager</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="nc">StaggeredGridLayoutManager</span><span class="p">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//实现瀑布流。瀑布流每个列表项高度不同，需要Adapter中修改展示出来
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>RecycleView实现点击事件的最佳实践：在 <code>Adapter</code> 中定义一个回调接口或高阶函数，将点击事件传递给 <code>Activity</code> 或 <code>Fragment</code> 进行处理。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.view.LayoutInflater</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.view.View</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.view.ViewGroup</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">android.widget.TextView</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.recyclerview.widget.RecyclerView</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 1. 修改构造函数，增加一个高阶函数参数 onItemClick
+</span></span></span><span class="line"><span class="cl"><span class="c1">// (String) -&gt; Unit 表示这是一个接收 String 类型参数且无返回值的函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">MyAdapter</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">val</span> <span class="py">dataSet</span><span class="p">:</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">String</span><span class="p">&gt;,</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">val</span> <span class="py">onItemClick</span><span class="p">:</span> <span class="p">(</span><span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Unit</span> <span class="c1">// 新增的点击事件回调
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span> <span class="p">:</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="n">Adapter</span><span class="p">&lt;</span><span class="nc">MyAdapter</span><span class="p">.</span><span class="n">MyViewHolder</span><span class="p">&gt;()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 2. 修改 ViewHolder，让它能接收点击事件并处理
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">inner</span> <span class="k">class</span> <span class="nc">MyViewHolder</span><span class="p">(</span><span class="n">view</span><span class="p">:</span> <span class="n">View</span><span class="p">)</span> <span class="p">:</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="n">ViewHolder</span><span class="p">(</span><span class="n">view</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">val</span> <span class="py">textView</span><span class="p">:</span> <span class="n">TextView</span> <span class="p">=</span> <span class="n">view</span><span class="p">.</span><span class="n">findViewById</span><span class="p">(</span><span class="nc">R</span><span class="p">.</span><span class="n">id</span><span class="p">.</span><span class="n">item_textview</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">init</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 在 ViewHolder 初始化时，为整个列表项视图设置点击监听器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">itemView</span><span class="p">.</span><span class="n">setOnClickListener</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="c1">// 确保点击的位置是有效的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                <span class="k">if</span> <span class="p">(</span><span class="n">adapterPosition</span> <span class="o">!=</span> <span class="nc">RecyclerView</span><span class="p">.</span><span class="n">NO_POSITION</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="c1">// 调用我们从构造函数传入的 lambda 函数，
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="c1">// 并将对应位置的数据作为参数传递过去
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="n">onItemClick</span><span class="p">(</span><span class="n">dataSet</span><span class="p">[</span><span class="n">adapterPosition</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//其他重写方法保持不变
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="kotlin补充">Kotlin补充
+</h4><p>延迟初始化：</p>
+<p><code>lateinit</code> 关键字，使得可以在使用的时候再对变量初始化并且声明时无需声明为可空类型，这样就可以减少频繁的非空检查。但是要注意：</p>
+<ul>
+<li>
+<p><strong><code>lateinit var</code></strong>：<code>lateinit</code> 只能用于 <code>var</code>（可变变量），不能用于 <code>val</code>（不可变变量），因为它必须在稍后被赋值。</p>
+</li>
+<li>
+<p><strong>非空类型</strong>：它只能用于非空的对象类型（如 <code>String</code>, <code>TextView</code> 等），不能用于基础数据类型（如 <code>Int</code>, <code>Boolean</code>, <code>Float</code> 等），因为基础类型在编译后会被初始化为默认值（如 <code>0</code>, <code>false</code>）。</p>
+</li>
+<li>
+<p><strong>不能有自定义的 Getter/Setter</strong>。</p>
+</li>
+<li>
+<p><strong>风险</strong>：如果你在初始化之前就访问一个 <code>lateinit</code> 属性，程序将在运行时抛出 <code>UninitializedPropertyAccessException</code> 异常，导致应用崩溃。<strong>这是使用 <code>lateinit</code> 的唯一风险。</strong></p>
+</li>
+</ul>
+<p>密封类：</p>
+<p><strong>密封类</strong>用于表示一个<strong>受限制的类继承结构</strong>。一个密封类的所有直接子类都必须在<strong>同一个文件</strong>中声明。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="c1">// 1. 定义一个密封类和它的所有子类（必须在同一个文件里）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">sealed</span> <span class="k">class</span> <span class="nc">Result</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">object</span> <span class="nc">Loading</span> <span class="p">:</span> <span class="n">Result</span><span class="p">&lt;</span><span class="n">Nothing</span><span class="p">&gt;()</span> <span class="c1">// 加载中状态，使用 object 因为它没有自身状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">data</span> <span class="k">class</span> <span class="nc">Success</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="k">val</span> <span class="py">data</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="p">:</span> <span class="n">Result</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;()</span> <span class="c1">// 成功状态，携带数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">data</span> <span class="k">class</span> <span class="nc">Error</span><span class="p">(</span><span class="k">val</span> <span class="py">exception</span><span class="p">:</span> <span class="n">Exception</span><span class="p">)</span> <span class="p">:</span> <span class="n">Result</span><span class="p">&lt;</span><span class="n">Nothing</span><span class="p">&gt;()</span> <span class="c1">// 失败状态，携带异常信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 2. 在代码中使用 when 表达式处理所有可能的状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">fun</span> <span class="nf">handleResult</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">Result</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">when</span> <span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">is</span> <span class="nc">Result</span><span class="p">.</span><span class="n">Loading</span> <span class="o">-&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 显示加载中的 UI
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">println</span><span class="p">(</span><span class="s2">&#34;Loading...&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">is</span> <span class="nc">Result</span><span class="p">.</span><span class="n">Success</span> <span class="o">-&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 成功，使用 result.data 来更新 UI
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">println</span><span class="p">(</span><span class="s2">&#34;Success! User name: </span><span class="si">${result.data.name}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">is</span> <span class="nc">Result</span><span class="p">.</span><span class="n">Error</span> <span class="o">-&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 失败，使用 result.exception 来显示错误信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">println</span><span class="p">(</span><span class="s2">&#34;Error: </span><span class="si">${result.exception.message}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">//注意：这里不需要 else 分支！
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+        
+            <a href="/tags/%E5%AE%89%E5%8D%93%E5%BC%80%E5%8F%91/">安卓开发</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%813/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第一行代码（3）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%812/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第一行代码（2）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/%E7%AC%AC%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%811/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第一行代码（1）</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    
+    
+    <section class="totalcount">
+    
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+    发表了22篇文章 · 
+    总计6.71k字
+    </section>
+
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<a href="#" id="back-to-top" title="返回顶部"></a>
+
+
+<style>
+  #back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 55px;
+    width: 55px;
+    height: 55px;
+    border-radius: 7px;
+    background-color: rgba(64, 158, 255, 0.5);
+    box-shadow: var(--shadow-l2);
+    font-size: 30px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+  }
+
+  #back-to-top:before {
+    content: ' ';
+    display: inline-block;
+    position: relative;
+    top: 0;
+    transform: rotate(135deg);
+    height: 10px;
+    width: 10px;
+    border-width: 0 0 2px 2px;
+    border-color: var(--back-to-top-color);
+    border-style: solid;
+  }
+
+  #back-to-top:hover:before {
+    border-color: #2674e0;
+  }
+
+   
+  @media screen and (max-width: 768px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      font-size: 10px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1024px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 40px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1280px) {
+    #back-to-top {
+      bottom: 20px;
+      right: 55px;
+    }
+  }
+
+   
+  @media screen and (min-width: 1536px) {
+    #back-to-top {
+      visibility: hidden;
+    }
+  }
+</style>
+
+
+<script>
+  function backToTop() {
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+    })
+  }
+
+  window.onload = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop > 0) {
+      totopBtn.style.display = 'inline'
+    } else {
+      totopBtn.style.display = 'none'
+    }
+  }
+
+  window.onscroll = function () {
+    let scrollTop =
+      this.document.documentElement.scrollTop || this.document.body.scrollTop
+    let totopBtn = this.document.getElementById('back-to-top')
+    if (scrollTop < 200) {
+      totopBtn.style.display = 'none'
+    } else {
+      totopBtn.style.display = 'inline'
+      totopBtn.addEventListener('click', backToTop, false)
+    }
+  }
+</script>
+
+    </body>
+</html>
